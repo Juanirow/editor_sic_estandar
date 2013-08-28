@@ -36,7 +36,7 @@ class Window_Form(QtGui.QMainWindow):
         if self.textbox:
             self.textbox.close()
         self.textbox = QtGui.QTextEdit(self)
-        self.textbox.setMinimumSize(790,600)
+        self.textbox.setMinimumSize(800,500)
         self.textbox.setText(text)
         self.textbox.show()
     
