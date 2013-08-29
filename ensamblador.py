@@ -19,23 +19,19 @@ class Ensamblador:
 		return errors
 
 	def analiza(self,text):
-		parser.ini_sintactic_errors()
-		parser.ini_lexic_errors()
-		print str(self.num_errors())
+		parser.errors = []
+		parser.list_line_errors = []
+		parser.scann.errors = []
+		parser.scann.list_error_line = []
 		parse.parse(text)
-		print str(self.num_errors())
 
 	def get_all_errors(self):
-		print self.get_scanner_errors()
-		print self.get_parser_errors()
 		return self.get_scanner_errors() + self.get_parser_errors()
 
 	def num_errors(self):
-		print "num_errors"
 		return len(self.get_all_errors())
 
 	def get_errors_string(self):
-		print "errors_string"
 		errors = self.get_all_errors()
 		text = ""
 		for n in errors:

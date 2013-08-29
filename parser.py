@@ -19,16 +19,6 @@ def get_lexic_errors():
 def get_sintactic_errors():
   return errors 
 
-def ini_sintactic_errors():
-  errors = []
-  list_line_errors = []
-  print errors
-  print list_line_errors
-  
-def ini_lexic_errors():
-  scanner.ini_lexic_errors()
-  parse = yacc.yacc()
-
 #  definicion de las reglas gramaticas con operaciones de dos operandos
 
 # regla inicial la cual empareja la instruccion de start
@@ -179,7 +169,8 @@ def p_error(t):
     line_error = str(t.lexer.lineno)
     if not line_error in list_line_errors:
       token = get_token(t.value)
-      errors.append("En la linea: " + line_error+" cerca de: "+token)
+      error ="En la linea: " + line_error+" cerca de: "+token
+      errors.append(error)
       list_line_errors.append(line_error)
       yacc.errok()
   else: 

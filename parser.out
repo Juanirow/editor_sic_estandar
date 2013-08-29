@@ -1,0 +1,1495 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> INI
+Rule 1     INI -> DS C DE
+Rule 2     DS -> ETIQUETA START HEX
+Rule 3     DE -> END ETIQUETA
+Rule 4     DE -> END
+Rule 5     C -> DC C
+Rule 6     C -> CP C
+Rule 7     C -> EPSILON
+Rule 8     EPSILON -> <empty>
+Rule 9     DC -> DBYTE
+Rule 10    DC -> DIRECTIVA
+Rule 11    DBYTE -> ETIQUETA BYTE BVALOR
+Rule 12    DBYTE -> BYTE BVALOR
+Rule 13    BVALOR -> CVALOR
+Rule 14    BVALOR -> XVALOR
+Rule 15    BVALOR -> error
+Rule 16    DIRECTIVA -> ETIQUETA NEMDIRECTIVA
+Rule 17    DIRECTIVA -> NEMDIRECTIVA
+Rule 18    NEMDIRECTIVA -> NEMONICO HEX
+Rule 19    NEMDIRECTIVA -> NEMONICO DECIMAL
+Rule 20    NEMDIRECTIVA -> NEMONICO error
+Rule 21    NEMONICO -> WORD
+Rule 22    NEMONICO -> RESB
+Rule 23    NEMONICO -> RESW
+Rule 24    CP -> ETIQUETA CI
+Rule 25    CP -> CI
+Rule 26    CI -> INSTRUCCION ETIQUETA
+Rule 27    CI -> INSTRUCCION ETIQUETA DIR
+Rule 28    CI -> RSUB
+Rule 29    INSTRUCCION -> ADD
+Rule 30    INSTRUCCION -> AND
+Rule 31    INSTRUCCION -> COMP
+Rule 32    INSTRUCCION -> DIV
+Rule 33    INSTRUCCION -> J
+Rule 34    INSTRUCCION -> JEQ
+Rule 35    INSTRUCCION -> JGT
+Rule 36    INSTRUCCION -> JLT
+Rule 37    INSTRUCCION -> JSUB
+Rule 38    INSTRUCCION -> LDA
+Rule 39    INSTRUCCION -> LDCH
+Rule 40    INSTRUCCION -> LDL
+Rule 41    INSTRUCCION -> LDX
+Rule 42    INSTRUCCION -> MUL
+Rule 43    INSTRUCCION -> OR
+Rule 44    INSTRUCCION -> RD
+Rule 45    INSTRUCCION -> TIX
+Rule 46    INSTRUCCION -> STA
+Rule 47    INSTRUCCION -> STCH
+Rule 48    INSTRUCCION -> STL
+Rule 49    INSTRUCCION -> STSW
+Rule 50    INSTRUCCION -> STX
+Rule 51    INSTRUCCION -> SUB
+Rule 52    INSTRUCCION -> TD
+Rule 53    INSTRUCCION -> WD
+
+Terminals, with rules where they appear
+
+ADD                  : 29
+AND                  : 30
+BYTE                 : 11 12
+COMP                 : 31
+CVALOR               : 13
+DECIMAL              : 19
+DIR                  : 27
+DIV                  : 32
+END                  : 3 4
+ETIQUETA             : 2 3 11 16 24 26 27
+HEX                  : 2 18
+J                    : 33
+JEQ                  : 34
+JGT                  : 35
+JLT                  : 36
+JSUB                 : 37
+LDA                  : 38
+LDCH                 : 39
+LDL                  : 40
+LDX                  : 41
+MUL                  : 42
+OR                   : 43
+RD                   : 44
+RESB                 : 22
+RESW                 : 23
+RSUB                 : 28
+STA                  : 46
+START                : 2
+STCH                 : 47
+STL                  : 48
+STSW                 : 49
+STX                  : 50
+SUB                  : 51
+TD                   : 52
+TIX                  : 45
+WD                   : 53
+WORD                 : 21
+XVALOR               : 14
+error                : 15 20
+
+Nonterminals, with rules where they appear
+
+BVALOR               : 11 12
+C                    : 1 5 6
+CI                   : 24 25
+CP                   : 6
+DBYTE                : 9
+DC                   : 5
+DE                   : 1
+DIRECTIVA            : 10
+DS                   : 1
+EPSILON              : 7
+INI                  : 0
+INSTRUCCION          : 26 27
+NEMDIRECTIVA         : 16 17
+NEMONICO             : 18 19 20
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . INI
+    (1) INI -> . DS C DE
+    (2) DS -> . ETIQUETA START HEX
+
+    ETIQUETA        shift and go to state 1
+
+    INI                            shift and go to state 2
+    DS                             shift and go to state 3
+
+state 1
+
+    (2) DS -> ETIQUETA . START HEX
+
+    START           shift and go to state 4
+
+
+state 2
+
+    (0) S' -> INI .
+
+
+
+state 3
+
+    (1) INI -> DS . C DE
+    (5) C -> . DC C
+    (6) C -> . CP C
+    (7) C -> . EPSILON
+    (9) DC -> . DBYTE
+    (10) DC -> . DIRECTIVA
+    (24) CP -> . ETIQUETA CI
+    (25) CP -> . CI
+    (8) EPSILON -> .
+    (11) DBYTE -> . ETIQUETA BYTE BVALOR
+    (12) DBYTE -> . BYTE BVALOR
+    (16) DIRECTIVA -> . ETIQUETA NEMDIRECTIVA
+    (17) DIRECTIVA -> . NEMDIRECTIVA
+    (26) CI -> . INSTRUCCION ETIQUETA
+    (27) CI -> . INSTRUCCION ETIQUETA DIR
+    (28) CI -> . RSUB
+    (18) NEMDIRECTIVA -> . NEMONICO HEX
+    (19) NEMDIRECTIVA -> . NEMONICO DECIMAL
+    (20) NEMDIRECTIVA -> . NEMONICO error
+    (29) INSTRUCCION -> . ADD
+    (30) INSTRUCCION -> . AND
+    (31) INSTRUCCION -> . COMP
+    (32) INSTRUCCION -> . DIV
+    (33) INSTRUCCION -> . J
+    (34) INSTRUCCION -> . JEQ
+    (35) INSTRUCCION -> . JGT
+    (36) INSTRUCCION -> . JLT
+    (37) INSTRUCCION -> . JSUB
+    (38) INSTRUCCION -> . LDA
+    (39) INSTRUCCION -> . LDCH
+    (40) INSTRUCCION -> . LDL
+    (41) INSTRUCCION -> . LDX
+    (42) INSTRUCCION -> . MUL
+    (43) INSTRUCCION -> . OR
+    (44) INSTRUCCION -> . RD
+    (45) INSTRUCCION -> . TIX
+    (46) INSTRUCCION -> . STA
+    (47) INSTRUCCION -> . STCH
+    (48) INSTRUCCION -> . STL
+    (49) INSTRUCCION -> . STSW
+    (50) INSTRUCCION -> . STX
+    (51) INSTRUCCION -> . SUB
+    (52) INSTRUCCION -> . TD
+    (53) INSTRUCCION -> . WD
+    (21) NEMONICO -> . WORD
+    (22) NEMONICO -> . RESB
+    (23) NEMONICO -> . RESW
+
+    ETIQUETA        shift and go to state 11
+    END             reduce using rule 8 (EPSILON -> .)
+    BYTE            shift and go to state 35
+    RSUB            shift and go to state 17
+    ADD             shift and go to state 33
+    AND             shift and go to state 38
+    COMP            shift and go to state 28
+    DIV             shift and go to state 13
+    J               shift and go to state 29
+    JEQ             shift and go to state 24
+    JGT             shift and go to state 37
+    JLT             shift and go to state 39
+    JSUB            shift and go to state 32
+    LDA             shift and go to state 15
+    LDCH            shift and go to state 40
+    LDL             shift and go to state 19
+    LDX             shift and go to state 22
+    MUL             shift and go to state 12
+    OR              shift and go to state 45
+    RD              shift and go to state 20
+    TIX             shift and go to state 7
+    STA             shift and go to state 25
+    STCH            shift and go to state 5
+    STL             shift and go to state 27
+    STSW            shift and go to state 14
+    STX             shift and go to state 18
+    SUB             shift and go to state 8
+    TD              shift and go to state 21
+    WD              shift and go to state 6
+    WORD            shift and go to state 16
+    RESB            shift and go to state 34
+    RESW            shift and go to state 30
+
+    C                              shift and go to state 23
+    DIRECTIVA                      shift and go to state 10
+    DBYTE                          shift and go to state 41
+    EPSILON                        shift and go to state 42
+    INSTRUCCION                    shift and go to state 9
+    CI                             shift and go to state 43
+    DC                             shift and go to state 31
+    NEMONICO                       shift and go to state 44
+    NEMDIRECTIVA                   shift and go to state 26
+    CP                             shift and go to state 36
+
+state 4
+
+    (2) DS -> ETIQUETA START . HEX
+
+    HEX             shift and go to state 46
+
+
+state 5
+
+    (47) INSTRUCCION -> STCH .
+
+    ETIQUETA        reduce using rule 47 (INSTRUCCION -> STCH .)
+
+
+state 6
+
+    (53) INSTRUCCION -> WD .
+
+    ETIQUETA        reduce using rule 53 (INSTRUCCION -> WD .)
+
+
+state 7
+
+    (45) INSTRUCCION -> TIX .
+
+    ETIQUETA        reduce using rule 45 (INSTRUCCION -> TIX .)
+
+
+state 8
+
+    (51) INSTRUCCION -> SUB .
+
+    ETIQUETA        reduce using rule 51 (INSTRUCCION -> SUB .)
+
+
+state 9
+
+    (26) CI -> INSTRUCCION . ETIQUETA
+    (27) CI -> INSTRUCCION . ETIQUETA DIR
+
+    ETIQUETA        shift and go to state 47
+
+
+state 10
+
+    (10) DC -> DIRECTIVA .
+
+    ETIQUETA        reduce using rule 10 (DC -> DIRECTIVA .)
+    BYTE            reduce using rule 10 (DC -> DIRECTIVA .)
+    RSUB            reduce using rule 10 (DC -> DIRECTIVA .)
+    ADD             reduce using rule 10 (DC -> DIRECTIVA .)
+    AND             reduce using rule 10 (DC -> DIRECTIVA .)
+    COMP            reduce using rule 10 (DC -> DIRECTIVA .)
+    DIV             reduce using rule 10 (DC -> DIRECTIVA .)
+    J               reduce using rule 10 (DC -> DIRECTIVA .)
+    JEQ             reduce using rule 10 (DC -> DIRECTIVA .)
+    JGT             reduce using rule 10 (DC -> DIRECTIVA .)
+    JLT             reduce using rule 10 (DC -> DIRECTIVA .)
+    JSUB            reduce using rule 10 (DC -> DIRECTIVA .)
+    LDA             reduce using rule 10 (DC -> DIRECTIVA .)
+    LDCH            reduce using rule 10 (DC -> DIRECTIVA .)
+    LDL             reduce using rule 10 (DC -> DIRECTIVA .)
+    LDX             reduce using rule 10 (DC -> DIRECTIVA .)
+    MUL             reduce using rule 10 (DC -> DIRECTIVA .)
+    OR              reduce using rule 10 (DC -> DIRECTIVA .)
+    RD              reduce using rule 10 (DC -> DIRECTIVA .)
+    TIX             reduce using rule 10 (DC -> DIRECTIVA .)
+    STA             reduce using rule 10 (DC -> DIRECTIVA .)
+    STCH            reduce using rule 10 (DC -> DIRECTIVA .)
+    STL             reduce using rule 10 (DC -> DIRECTIVA .)
+    STSW            reduce using rule 10 (DC -> DIRECTIVA .)
+    STX             reduce using rule 10 (DC -> DIRECTIVA .)
+    SUB             reduce using rule 10 (DC -> DIRECTIVA .)
+    TD              reduce using rule 10 (DC -> DIRECTIVA .)
+    WD              reduce using rule 10 (DC -> DIRECTIVA .)
+    WORD            reduce using rule 10 (DC -> DIRECTIVA .)
+    RESB            reduce using rule 10 (DC -> DIRECTIVA .)
+    RESW            reduce using rule 10 (DC -> DIRECTIVA .)
+    END             reduce using rule 10 (DC -> DIRECTIVA .)
+
+
+state 11
+
+    (24) CP -> ETIQUETA . CI
+    (11) DBYTE -> ETIQUETA . BYTE BVALOR
+    (16) DIRECTIVA -> ETIQUETA . NEMDIRECTIVA
+    (26) CI -> . INSTRUCCION ETIQUETA
+    (27) CI -> . INSTRUCCION ETIQUETA DIR
+    (28) CI -> . RSUB
+    (18) NEMDIRECTIVA -> . NEMONICO HEX
+    (19) NEMDIRECTIVA -> . NEMONICO DECIMAL
+    (20) NEMDIRECTIVA -> . NEMONICO error
+    (29) INSTRUCCION -> . ADD
+    (30) INSTRUCCION -> . AND
+    (31) INSTRUCCION -> . COMP
+    (32) INSTRUCCION -> . DIV
+    (33) INSTRUCCION -> . J
+    (34) INSTRUCCION -> . JEQ
+    (35) INSTRUCCION -> . JGT
+    (36) INSTRUCCION -> . JLT
+    (37) INSTRUCCION -> . JSUB
+    (38) INSTRUCCION -> . LDA
+    (39) INSTRUCCION -> . LDCH
+    (40) INSTRUCCION -> . LDL
+    (41) INSTRUCCION -> . LDX
+    (42) INSTRUCCION -> . MUL
+    (43) INSTRUCCION -> . OR
+    (44) INSTRUCCION -> . RD
+    (45) INSTRUCCION -> . TIX
+    (46) INSTRUCCION -> . STA
+    (47) INSTRUCCION -> . STCH
+    (48) INSTRUCCION -> . STL
+    (49) INSTRUCCION -> . STSW
+    (50) INSTRUCCION -> . STX
+    (51) INSTRUCCION -> . SUB
+    (52) INSTRUCCION -> . TD
+    (53) INSTRUCCION -> . WD
+    (21) NEMONICO -> . WORD
+    (22) NEMONICO -> . RESB
+    (23) NEMONICO -> . RESW
+
+    BYTE            shift and go to state 50
+    RSUB            shift and go to state 17
+    ADD             shift and go to state 33
+    AND             shift and go to state 38
+    COMP            shift and go to state 28
+    DIV             shift and go to state 13
+    J               shift and go to state 29
+    JEQ             shift and go to state 24
+    JGT             shift and go to state 37
+    JLT             shift and go to state 39
+    JSUB            shift and go to state 32
+    LDA             shift and go to state 15
+    LDCH            shift and go to state 40
+    LDL             shift and go to state 19
+    LDX             shift and go to state 22
+    MUL             shift and go to state 12
+    OR              shift and go to state 45
+    RD              shift and go to state 20
+    TIX             shift and go to state 7
+    STA             shift and go to state 25
+    STCH            shift and go to state 5
+    STL             shift and go to state 27
+    STSW            shift and go to state 14
+    STX             shift and go to state 18
+    SUB             shift and go to state 8
+    TD              shift and go to state 21
+    WD              shift and go to state 6
+    WORD            shift and go to state 16
+    RESB            shift and go to state 34
+    RESW            shift and go to state 30
+
+    CI                             shift and go to state 48
+    INSTRUCCION                    shift and go to state 9
+    NEMONICO                       shift and go to state 44
+    NEMDIRECTIVA                   shift and go to state 49
+
+state 12
+
+    (42) INSTRUCCION -> MUL .
+
+    ETIQUETA        reduce using rule 42 (INSTRUCCION -> MUL .)
+
+
+state 13
+
+    (32) INSTRUCCION -> DIV .
+
+    ETIQUETA        reduce using rule 32 (INSTRUCCION -> DIV .)
+
+
+state 14
+
+    (49) INSTRUCCION -> STSW .
+
+    ETIQUETA        reduce using rule 49 (INSTRUCCION -> STSW .)
+
+
+state 15
+
+    (38) INSTRUCCION -> LDA .
+
+    ETIQUETA        reduce using rule 38 (INSTRUCCION -> LDA .)
+
+
+state 16
+
+    (21) NEMONICO -> WORD .
+
+    HEX             reduce using rule 21 (NEMONICO -> WORD .)
+    DECIMAL         reduce using rule 21 (NEMONICO -> WORD .)
+    error           reduce using rule 21 (NEMONICO -> WORD .)
+
+
+state 17
+
+    (28) CI -> RSUB .
+
+    ETIQUETA        reduce using rule 28 (CI -> RSUB .)
+    BYTE            reduce using rule 28 (CI -> RSUB .)
+    RSUB            reduce using rule 28 (CI -> RSUB .)
+    ADD             reduce using rule 28 (CI -> RSUB .)
+    AND             reduce using rule 28 (CI -> RSUB .)
+    COMP            reduce using rule 28 (CI -> RSUB .)
+    DIV             reduce using rule 28 (CI -> RSUB .)
+    J               reduce using rule 28 (CI -> RSUB .)
+    JEQ             reduce using rule 28 (CI -> RSUB .)
+    JGT             reduce using rule 28 (CI -> RSUB .)
+    JLT             reduce using rule 28 (CI -> RSUB .)
+    JSUB            reduce using rule 28 (CI -> RSUB .)
+    LDA             reduce using rule 28 (CI -> RSUB .)
+    LDCH            reduce using rule 28 (CI -> RSUB .)
+    LDL             reduce using rule 28 (CI -> RSUB .)
+    LDX             reduce using rule 28 (CI -> RSUB .)
+    MUL             reduce using rule 28 (CI -> RSUB .)
+    OR              reduce using rule 28 (CI -> RSUB .)
+    RD              reduce using rule 28 (CI -> RSUB .)
+    TIX             reduce using rule 28 (CI -> RSUB .)
+    STA             reduce using rule 28 (CI -> RSUB .)
+    STCH            reduce using rule 28 (CI -> RSUB .)
+    STL             reduce using rule 28 (CI -> RSUB .)
+    STSW            reduce using rule 28 (CI -> RSUB .)
+    STX             reduce using rule 28 (CI -> RSUB .)
+    SUB             reduce using rule 28 (CI -> RSUB .)
+    TD              reduce using rule 28 (CI -> RSUB .)
+    WD              reduce using rule 28 (CI -> RSUB .)
+    WORD            reduce using rule 28 (CI -> RSUB .)
+    RESB            reduce using rule 28 (CI -> RSUB .)
+    RESW            reduce using rule 28 (CI -> RSUB .)
+    END             reduce using rule 28 (CI -> RSUB .)
+
+
+state 18
+
+    (50) INSTRUCCION -> STX .
+
+    ETIQUETA        reduce using rule 50 (INSTRUCCION -> STX .)
+
+
+state 19
+
+    (40) INSTRUCCION -> LDL .
+
+    ETIQUETA        reduce using rule 40 (INSTRUCCION -> LDL .)
+
+
+state 20
+
+    (44) INSTRUCCION -> RD .
+
+    ETIQUETA        reduce using rule 44 (INSTRUCCION -> RD .)
+
+
+state 21
+
+    (52) INSTRUCCION -> TD .
+
+    ETIQUETA        reduce using rule 52 (INSTRUCCION -> TD .)
+
+
+state 22
+
+    (41) INSTRUCCION -> LDX .
+
+    ETIQUETA        reduce using rule 41 (INSTRUCCION -> LDX .)
+
+
+state 23
+
+    (1) INI -> DS C . DE
+    (3) DE -> . END ETIQUETA
+    (4) DE -> . END
+
+    END             shift and go to state 52
+
+    DE                             shift and go to state 51
+
+state 24
+
+    (34) INSTRUCCION -> JEQ .
+
+    ETIQUETA        reduce using rule 34 (INSTRUCCION -> JEQ .)
+
+
+state 25
+
+    (46) INSTRUCCION -> STA .
+
+    ETIQUETA        reduce using rule 46 (INSTRUCCION -> STA .)
+
+
+state 26
+
+    (17) DIRECTIVA -> NEMDIRECTIVA .
+
+    ETIQUETA        reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    BYTE            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    RSUB            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    ADD             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    AND             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    COMP            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    DIV             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    J               reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    JEQ             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    JGT             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    JLT             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    JSUB            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    LDA             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    LDCH            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    LDL             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    LDX             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    MUL             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    OR              reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    RD              reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    TIX             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    STA             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    STCH            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    STL             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    STSW            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    STX             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    SUB             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    TD              reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    WD              reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    WORD            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    RESB            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    RESW            reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+    END             reduce using rule 17 (DIRECTIVA -> NEMDIRECTIVA .)
+
+
+state 27
+
+    (48) INSTRUCCION -> STL .
+
+    ETIQUETA        reduce using rule 48 (INSTRUCCION -> STL .)
+
+
+state 28
+
+    (31) INSTRUCCION -> COMP .
+
+    ETIQUETA        reduce using rule 31 (INSTRUCCION -> COMP .)
+
+
+state 29
+
+    (33) INSTRUCCION -> J .
+
+    ETIQUETA        reduce using rule 33 (INSTRUCCION -> J .)
+
+
+state 30
+
+    (23) NEMONICO -> RESW .
+
+    HEX             reduce using rule 23 (NEMONICO -> RESW .)
+    DECIMAL         reduce using rule 23 (NEMONICO -> RESW .)
+    error           reduce using rule 23 (NEMONICO -> RESW .)
+
+
+state 31
+
+    (5) C -> DC . C
+    (5) C -> . DC C
+    (6) C -> . CP C
+    (7) C -> . EPSILON
+    (9) DC -> . DBYTE
+    (10) DC -> . DIRECTIVA
+    (24) CP -> . ETIQUETA CI
+    (25) CP -> . CI
+    (8) EPSILON -> .
+    (11) DBYTE -> . ETIQUETA BYTE BVALOR
+    (12) DBYTE -> . BYTE BVALOR
+    (16) DIRECTIVA -> . ETIQUETA NEMDIRECTIVA
+    (17) DIRECTIVA -> . NEMDIRECTIVA
+    (26) CI -> . INSTRUCCION ETIQUETA
+    (27) CI -> . INSTRUCCION ETIQUETA DIR
+    (28) CI -> . RSUB
+    (18) NEMDIRECTIVA -> . NEMONICO HEX
+    (19) NEMDIRECTIVA -> . NEMONICO DECIMAL
+    (20) NEMDIRECTIVA -> . NEMONICO error
+    (29) INSTRUCCION -> . ADD
+    (30) INSTRUCCION -> . AND
+    (31) INSTRUCCION -> . COMP
+    (32) INSTRUCCION -> . DIV
+    (33) INSTRUCCION -> . J
+    (34) INSTRUCCION -> . JEQ
+    (35) INSTRUCCION -> . JGT
+    (36) INSTRUCCION -> . JLT
+    (37) INSTRUCCION -> . JSUB
+    (38) INSTRUCCION -> . LDA
+    (39) INSTRUCCION -> . LDCH
+    (40) INSTRUCCION -> . LDL
+    (41) INSTRUCCION -> . LDX
+    (42) INSTRUCCION -> . MUL
+    (43) INSTRUCCION -> . OR
+    (44) INSTRUCCION -> . RD
+    (45) INSTRUCCION -> . TIX
+    (46) INSTRUCCION -> . STA
+    (47) INSTRUCCION -> . STCH
+    (48) INSTRUCCION -> . STL
+    (49) INSTRUCCION -> . STSW
+    (50) INSTRUCCION -> . STX
+    (51) INSTRUCCION -> . SUB
+    (52) INSTRUCCION -> . TD
+    (53) INSTRUCCION -> . WD
+    (21) NEMONICO -> . WORD
+    (22) NEMONICO -> . RESB
+    (23) NEMONICO -> . RESW
+
+    ETIQUETA        shift and go to state 11
+    END             reduce using rule 8 (EPSILON -> .)
+    BYTE            shift and go to state 35
+    RSUB            shift and go to state 17
+    ADD             shift and go to state 33
+    AND             shift and go to state 38
+    COMP            shift and go to state 28
+    DIV             shift and go to state 13
+    J               shift and go to state 29
+    JEQ             shift and go to state 24
+    JGT             shift and go to state 37
+    JLT             shift and go to state 39
+    JSUB            shift and go to state 32
+    LDA             shift and go to state 15
+    LDCH            shift and go to state 40
+    LDL             shift and go to state 19
+    LDX             shift and go to state 22
+    MUL             shift and go to state 12
+    OR              shift and go to state 45
+    RD              shift and go to state 20
+    TIX             shift and go to state 7
+    STA             shift and go to state 25
+    STCH            shift and go to state 5
+    STL             shift and go to state 27
+    STSW            shift and go to state 14
+    STX             shift and go to state 18
+    SUB             shift and go to state 8
+    TD              shift and go to state 21
+    WD              shift and go to state 6
+    WORD            shift and go to state 16
+    RESB            shift and go to state 34
+    RESW            shift and go to state 30
+
+    C                              shift and go to state 53
+    DBYTE                          shift and go to state 41
+    EPSILON                        shift and go to state 42
+    INSTRUCCION                    shift and go to state 9
+    NEMDIRECTIVA                   shift and go to state 26
+    CI                             shift and go to state 43
+    DIRECTIVA                      shift and go to state 10
+    NEMONICO                       shift and go to state 44
+    DC                             shift and go to state 31
+    CP                             shift and go to state 36
+
+state 32
+
+    (37) INSTRUCCION -> JSUB .
+
+    ETIQUETA        reduce using rule 37 (INSTRUCCION -> JSUB .)
+
+
+state 33
+
+    (29) INSTRUCCION -> ADD .
+
+    ETIQUETA        reduce using rule 29 (INSTRUCCION -> ADD .)
+
+
+state 34
+
+    (22) NEMONICO -> RESB .
+
+    HEX             reduce using rule 22 (NEMONICO -> RESB .)
+    DECIMAL         reduce using rule 22 (NEMONICO -> RESB .)
+    error           reduce using rule 22 (NEMONICO -> RESB .)
+
+
+state 35
+
+    (12) DBYTE -> BYTE . BVALOR
+    (13) BVALOR -> . CVALOR
+    (14) BVALOR -> . XVALOR
+    (15) BVALOR -> . error
+
+    CVALOR          shift and go to state 54
+    XVALOR          shift and go to state 55
+    error           shift and go to state 57
+
+    BVALOR                         shift and go to state 56
+
+state 36
+
+    (6) C -> CP . C
+    (5) C -> . DC C
+    (6) C -> . CP C
+    (7) C -> . EPSILON
+    (9) DC -> . DBYTE
+    (10) DC -> . DIRECTIVA
+    (24) CP -> . ETIQUETA CI
+    (25) CP -> . CI
+    (8) EPSILON -> .
+    (11) DBYTE -> . ETIQUETA BYTE BVALOR
+    (12) DBYTE -> . BYTE BVALOR
+    (16) DIRECTIVA -> . ETIQUETA NEMDIRECTIVA
+    (17) DIRECTIVA -> . NEMDIRECTIVA
+    (26) CI -> . INSTRUCCION ETIQUETA
+    (27) CI -> . INSTRUCCION ETIQUETA DIR
+    (28) CI -> . RSUB
+    (18) NEMDIRECTIVA -> . NEMONICO HEX
+    (19) NEMDIRECTIVA -> . NEMONICO DECIMAL
+    (20) NEMDIRECTIVA -> . NEMONICO error
+    (29) INSTRUCCION -> . ADD
+    (30) INSTRUCCION -> . AND
+    (31) INSTRUCCION -> . COMP
+    (32) INSTRUCCION -> . DIV
+    (33) INSTRUCCION -> . J
+    (34) INSTRUCCION -> . JEQ
+    (35) INSTRUCCION -> . JGT
+    (36) INSTRUCCION -> . JLT
+    (37) INSTRUCCION -> . JSUB
+    (38) INSTRUCCION -> . LDA
+    (39) INSTRUCCION -> . LDCH
+    (40) INSTRUCCION -> . LDL
+    (41) INSTRUCCION -> . LDX
+    (42) INSTRUCCION -> . MUL
+    (43) INSTRUCCION -> . OR
+    (44) INSTRUCCION -> . RD
+    (45) INSTRUCCION -> . TIX
+    (46) INSTRUCCION -> . STA
+    (47) INSTRUCCION -> . STCH
+    (48) INSTRUCCION -> . STL
+    (49) INSTRUCCION -> . STSW
+    (50) INSTRUCCION -> . STX
+    (51) INSTRUCCION -> . SUB
+    (52) INSTRUCCION -> . TD
+    (53) INSTRUCCION -> . WD
+    (21) NEMONICO -> . WORD
+    (22) NEMONICO -> . RESB
+    (23) NEMONICO -> . RESW
+
+    ETIQUETA        shift and go to state 11
+    END             reduce using rule 8 (EPSILON -> .)
+    BYTE            shift and go to state 35
+    RSUB            shift and go to state 17
+    ADD             shift and go to state 33
+    AND             shift and go to state 38
+    COMP            shift and go to state 28
+    DIV             shift and go to state 13
+    J               shift and go to state 29
+    JEQ             shift and go to state 24
+    JGT             shift and go to state 37
+    JLT             shift and go to state 39
+    JSUB            shift and go to state 32
+    LDA             shift and go to state 15
+    LDCH            shift and go to state 40
+    LDL             shift and go to state 19
+    LDX             shift and go to state 22
+    MUL             shift and go to state 12
+    OR              shift and go to state 45
+    RD              shift and go to state 20
+    TIX             shift and go to state 7
+    STA             shift and go to state 25
+    STCH            shift and go to state 5
+    STL             shift and go to state 27
+    STSW            shift and go to state 14
+    STX             shift and go to state 18
+    SUB             shift and go to state 8
+    TD              shift and go to state 21
+    WD              shift and go to state 6
+    WORD            shift and go to state 16
+    RESB            shift and go to state 34
+    RESW            shift and go to state 30
+
+    C                              shift and go to state 58
+    DBYTE                          shift and go to state 41
+    EPSILON                        shift and go to state 42
+    INSTRUCCION                    shift and go to state 9
+    NEMDIRECTIVA                   shift and go to state 26
+    CI                             shift and go to state 43
+    DIRECTIVA                      shift and go to state 10
+    NEMONICO                       shift and go to state 44
+    DC                             shift and go to state 31
+    CP                             shift and go to state 36
+
+state 37
+
+    (35) INSTRUCCION -> JGT .
+
+    ETIQUETA        reduce using rule 35 (INSTRUCCION -> JGT .)
+
+
+state 38
+
+    (30) INSTRUCCION -> AND .
+
+    ETIQUETA        reduce using rule 30 (INSTRUCCION -> AND .)
+
+
+state 39
+
+    (36) INSTRUCCION -> JLT .
+
+    ETIQUETA        reduce using rule 36 (INSTRUCCION -> JLT .)
+
+
+state 40
+
+    (39) INSTRUCCION -> LDCH .
+
+    ETIQUETA        reduce using rule 39 (INSTRUCCION -> LDCH .)
+
+
+state 41
+
+    (9) DC -> DBYTE .
+
+    ETIQUETA        reduce using rule 9 (DC -> DBYTE .)
+    BYTE            reduce using rule 9 (DC -> DBYTE .)
+    RSUB            reduce using rule 9 (DC -> DBYTE .)
+    ADD             reduce using rule 9 (DC -> DBYTE .)
+    AND             reduce using rule 9 (DC -> DBYTE .)
+    COMP            reduce using rule 9 (DC -> DBYTE .)
+    DIV             reduce using rule 9 (DC -> DBYTE .)
+    J               reduce using rule 9 (DC -> DBYTE .)
+    JEQ             reduce using rule 9 (DC -> DBYTE .)
+    JGT             reduce using rule 9 (DC -> DBYTE .)
+    JLT             reduce using rule 9 (DC -> DBYTE .)
+    JSUB            reduce using rule 9 (DC -> DBYTE .)
+    LDA             reduce using rule 9 (DC -> DBYTE .)
+    LDCH            reduce using rule 9 (DC -> DBYTE .)
+    LDL             reduce using rule 9 (DC -> DBYTE .)
+    LDX             reduce using rule 9 (DC -> DBYTE .)
+    MUL             reduce using rule 9 (DC -> DBYTE .)
+    OR              reduce using rule 9 (DC -> DBYTE .)
+    RD              reduce using rule 9 (DC -> DBYTE .)
+    TIX             reduce using rule 9 (DC -> DBYTE .)
+    STA             reduce using rule 9 (DC -> DBYTE .)
+    STCH            reduce using rule 9 (DC -> DBYTE .)
+    STL             reduce using rule 9 (DC -> DBYTE .)
+    STSW            reduce using rule 9 (DC -> DBYTE .)
+    STX             reduce using rule 9 (DC -> DBYTE .)
+    SUB             reduce using rule 9 (DC -> DBYTE .)
+    TD              reduce using rule 9 (DC -> DBYTE .)
+    WD              reduce using rule 9 (DC -> DBYTE .)
+    WORD            reduce using rule 9 (DC -> DBYTE .)
+    RESB            reduce using rule 9 (DC -> DBYTE .)
+    RESW            reduce using rule 9 (DC -> DBYTE .)
+    END             reduce using rule 9 (DC -> DBYTE .)
+
+
+state 42
+
+    (7) C -> EPSILON .
+
+    END             reduce using rule 7 (C -> EPSILON .)
+
+
+state 43
+
+    (25) CP -> CI .
+
+    ETIQUETA        reduce using rule 25 (CP -> CI .)
+    BYTE            reduce using rule 25 (CP -> CI .)
+    RSUB            reduce using rule 25 (CP -> CI .)
+    ADD             reduce using rule 25 (CP -> CI .)
+    AND             reduce using rule 25 (CP -> CI .)
+    COMP            reduce using rule 25 (CP -> CI .)
+    DIV             reduce using rule 25 (CP -> CI .)
+    J               reduce using rule 25 (CP -> CI .)
+    JEQ             reduce using rule 25 (CP -> CI .)
+    JGT             reduce using rule 25 (CP -> CI .)
+    JLT             reduce using rule 25 (CP -> CI .)
+    JSUB            reduce using rule 25 (CP -> CI .)
+    LDA             reduce using rule 25 (CP -> CI .)
+    LDCH            reduce using rule 25 (CP -> CI .)
+    LDL             reduce using rule 25 (CP -> CI .)
+    LDX             reduce using rule 25 (CP -> CI .)
+    MUL             reduce using rule 25 (CP -> CI .)
+    OR              reduce using rule 25 (CP -> CI .)
+    RD              reduce using rule 25 (CP -> CI .)
+    TIX             reduce using rule 25 (CP -> CI .)
+    STA             reduce using rule 25 (CP -> CI .)
+    STCH            reduce using rule 25 (CP -> CI .)
+    STL             reduce using rule 25 (CP -> CI .)
+    STSW            reduce using rule 25 (CP -> CI .)
+    STX             reduce using rule 25 (CP -> CI .)
+    SUB             reduce using rule 25 (CP -> CI .)
+    TD              reduce using rule 25 (CP -> CI .)
+    WD              reduce using rule 25 (CP -> CI .)
+    WORD            reduce using rule 25 (CP -> CI .)
+    RESB            reduce using rule 25 (CP -> CI .)
+    RESW            reduce using rule 25 (CP -> CI .)
+    END             reduce using rule 25 (CP -> CI .)
+
+
+state 44
+
+    (18) NEMDIRECTIVA -> NEMONICO . HEX
+    (19) NEMDIRECTIVA -> NEMONICO . DECIMAL
+    (20) NEMDIRECTIVA -> NEMONICO . error
+
+    HEX             shift and go to state 60
+    DECIMAL         shift and go to state 59
+    error           shift and go to state 61
+
+
+state 45
+
+    (43) INSTRUCCION -> OR .
+
+    ETIQUETA        reduce using rule 43 (INSTRUCCION -> OR .)
+
+
+state 46
+
+    (2) DS -> ETIQUETA START HEX .
+
+    ETIQUETA        reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    BYTE            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    RSUB            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    ADD             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    AND             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    COMP            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    DIV             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    J               reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    JEQ             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    JGT             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    JLT             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    JSUB            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    LDA             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    LDCH            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    LDL             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    LDX             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    MUL             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    OR              reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    RD              reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    TIX             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    STA             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    STCH            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    STL             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    STSW            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    STX             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    SUB             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    TD              reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    WD              reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    WORD            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    RESB            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    RESW            reduce using rule 2 (DS -> ETIQUETA START HEX .)
+    END             reduce using rule 2 (DS -> ETIQUETA START HEX .)
+
+
+state 47
+
+    (26) CI -> INSTRUCCION ETIQUETA .
+    (27) CI -> INSTRUCCION ETIQUETA . DIR
+
+    ETIQUETA        reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    BYTE            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    RSUB            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    ADD             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    AND             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    COMP            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    DIV             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    J               reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    JEQ             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    JGT             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    JLT             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    JSUB            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    LDA             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    LDCH            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    LDL             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    LDX             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    MUL             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    OR              reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    RD              reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    TIX             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    STA             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    STCH            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    STL             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    STSW            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    STX             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    SUB             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    TD              reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    WD              reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    WORD            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    RESB            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    RESW            reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    END             reduce using rule 26 (CI -> INSTRUCCION ETIQUETA .)
+    DIR             shift and go to state 62
+
+
+state 48
+
+    (24) CP -> ETIQUETA CI .
+
+    ETIQUETA        reduce using rule 24 (CP -> ETIQUETA CI .)
+    BYTE            reduce using rule 24 (CP -> ETIQUETA CI .)
+    RSUB            reduce using rule 24 (CP -> ETIQUETA CI .)
+    ADD             reduce using rule 24 (CP -> ETIQUETA CI .)
+    AND             reduce using rule 24 (CP -> ETIQUETA CI .)
+    COMP            reduce using rule 24 (CP -> ETIQUETA CI .)
+    DIV             reduce using rule 24 (CP -> ETIQUETA CI .)
+    J               reduce using rule 24 (CP -> ETIQUETA CI .)
+    JEQ             reduce using rule 24 (CP -> ETIQUETA CI .)
+    JGT             reduce using rule 24 (CP -> ETIQUETA CI .)
+    JLT             reduce using rule 24 (CP -> ETIQUETA CI .)
+    JSUB            reduce using rule 24 (CP -> ETIQUETA CI .)
+    LDA             reduce using rule 24 (CP -> ETIQUETA CI .)
+    LDCH            reduce using rule 24 (CP -> ETIQUETA CI .)
+    LDL             reduce using rule 24 (CP -> ETIQUETA CI .)
+    LDX             reduce using rule 24 (CP -> ETIQUETA CI .)
+    MUL             reduce using rule 24 (CP -> ETIQUETA CI .)
+    OR              reduce using rule 24 (CP -> ETIQUETA CI .)
+    RD              reduce using rule 24 (CP -> ETIQUETA CI .)
+    TIX             reduce using rule 24 (CP -> ETIQUETA CI .)
+    STA             reduce using rule 24 (CP -> ETIQUETA CI .)
+    STCH            reduce using rule 24 (CP -> ETIQUETA CI .)
+    STL             reduce using rule 24 (CP -> ETIQUETA CI .)
+    STSW            reduce using rule 24 (CP -> ETIQUETA CI .)
+    STX             reduce using rule 24 (CP -> ETIQUETA CI .)
+    SUB             reduce using rule 24 (CP -> ETIQUETA CI .)
+    TD              reduce using rule 24 (CP -> ETIQUETA CI .)
+    WD              reduce using rule 24 (CP -> ETIQUETA CI .)
+    WORD            reduce using rule 24 (CP -> ETIQUETA CI .)
+    RESB            reduce using rule 24 (CP -> ETIQUETA CI .)
+    RESW            reduce using rule 24 (CP -> ETIQUETA CI .)
+    END             reduce using rule 24 (CP -> ETIQUETA CI .)
+
+
+state 49
+
+    (16) DIRECTIVA -> ETIQUETA NEMDIRECTIVA .
+
+    ETIQUETA        reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    BYTE            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    RSUB            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    ADD             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    AND             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    COMP            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    DIV             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    J               reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    JEQ             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    JGT             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    JLT             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    JSUB            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    LDA             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    LDCH            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    LDL             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    LDX             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    MUL             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    OR              reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    RD              reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    TIX             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    STA             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    STCH            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    STL             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    STSW            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    STX             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    SUB             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    TD              reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    WD              reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    WORD            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    RESB            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    RESW            reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+    END             reduce using rule 16 (DIRECTIVA -> ETIQUETA NEMDIRECTIVA .)
+
+
+state 50
+
+    (11) DBYTE -> ETIQUETA BYTE . BVALOR
+    (13) BVALOR -> . CVALOR
+    (14) BVALOR -> . XVALOR
+    (15) BVALOR -> . error
+
+    CVALOR          shift and go to state 54
+    XVALOR          shift and go to state 55
+    error           shift and go to state 57
+
+    BVALOR                         shift and go to state 63
+
+state 51
+
+    (1) INI -> DS C DE .
+
+    $end            reduce using rule 1 (INI -> DS C DE .)
+
+
+state 52
+
+    (3) DE -> END . ETIQUETA
+    (4) DE -> END .
+
+    ETIQUETA        shift and go to state 64
+    $end            reduce using rule 4 (DE -> END .)
+
+
+state 53
+
+    (5) C -> DC C .
+
+    END             reduce using rule 5 (C -> DC C .)
+
+
+state 54
+
+    (13) BVALOR -> CVALOR .
+
+    ETIQUETA        reduce using rule 13 (BVALOR -> CVALOR .)
+    BYTE            reduce using rule 13 (BVALOR -> CVALOR .)
+    RSUB            reduce using rule 13 (BVALOR -> CVALOR .)
+    ADD             reduce using rule 13 (BVALOR -> CVALOR .)
+    AND             reduce using rule 13 (BVALOR -> CVALOR .)
+    COMP            reduce using rule 13 (BVALOR -> CVALOR .)
+    DIV             reduce using rule 13 (BVALOR -> CVALOR .)
+    J               reduce using rule 13 (BVALOR -> CVALOR .)
+    JEQ             reduce using rule 13 (BVALOR -> CVALOR .)
+    JGT             reduce using rule 13 (BVALOR -> CVALOR .)
+    JLT             reduce using rule 13 (BVALOR -> CVALOR .)
+    JSUB            reduce using rule 13 (BVALOR -> CVALOR .)
+    LDA             reduce using rule 13 (BVALOR -> CVALOR .)
+    LDCH            reduce using rule 13 (BVALOR -> CVALOR .)
+    LDL             reduce using rule 13 (BVALOR -> CVALOR .)
+    LDX             reduce using rule 13 (BVALOR -> CVALOR .)
+    MUL             reduce using rule 13 (BVALOR -> CVALOR .)
+    OR              reduce using rule 13 (BVALOR -> CVALOR .)
+    RD              reduce using rule 13 (BVALOR -> CVALOR .)
+    TIX             reduce using rule 13 (BVALOR -> CVALOR .)
+    STA             reduce using rule 13 (BVALOR -> CVALOR .)
+    STCH            reduce using rule 13 (BVALOR -> CVALOR .)
+    STL             reduce using rule 13 (BVALOR -> CVALOR .)
+    STSW            reduce using rule 13 (BVALOR -> CVALOR .)
+    STX             reduce using rule 13 (BVALOR -> CVALOR .)
+    SUB             reduce using rule 13 (BVALOR -> CVALOR .)
+    TD              reduce using rule 13 (BVALOR -> CVALOR .)
+    WD              reduce using rule 13 (BVALOR -> CVALOR .)
+    WORD            reduce using rule 13 (BVALOR -> CVALOR .)
+    RESB            reduce using rule 13 (BVALOR -> CVALOR .)
+    RESW            reduce using rule 13 (BVALOR -> CVALOR .)
+    END             reduce using rule 13 (BVALOR -> CVALOR .)
+
+
+state 55
+
+    (14) BVALOR -> XVALOR .
+
+    ETIQUETA        reduce using rule 14 (BVALOR -> XVALOR .)
+    BYTE            reduce using rule 14 (BVALOR -> XVALOR .)
+    RSUB            reduce using rule 14 (BVALOR -> XVALOR .)
+    ADD             reduce using rule 14 (BVALOR -> XVALOR .)
+    AND             reduce using rule 14 (BVALOR -> XVALOR .)
+    COMP            reduce using rule 14 (BVALOR -> XVALOR .)
+    DIV             reduce using rule 14 (BVALOR -> XVALOR .)
+    J               reduce using rule 14 (BVALOR -> XVALOR .)
+    JEQ             reduce using rule 14 (BVALOR -> XVALOR .)
+    JGT             reduce using rule 14 (BVALOR -> XVALOR .)
+    JLT             reduce using rule 14 (BVALOR -> XVALOR .)
+    JSUB            reduce using rule 14 (BVALOR -> XVALOR .)
+    LDA             reduce using rule 14 (BVALOR -> XVALOR .)
+    LDCH            reduce using rule 14 (BVALOR -> XVALOR .)
+    LDL             reduce using rule 14 (BVALOR -> XVALOR .)
+    LDX             reduce using rule 14 (BVALOR -> XVALOR .)
+    MUL             reduce using rule 14 (BVALOR -> XVALOR .)
+    OR              reduce using rule 14 (BVALOR -> XVALOR .)
+    RD              reduce using rule 14 (BVALOR -> XVALOR .)
+    TIX             reduce using rule 14 (BVALOR -> XVALOR .)
+    STA             reduce using rule 14 (BVALOR -> XVALOR .)
+    STCH            reduce using rule 14 (BVALOR -> XVALOR .)
+    STL             reduce using rule 14 (BVALOR -> XVALOR .)
+    STSW            reduce using rule 14 (BVALOR -> XVALOR .)
+    STX             reduce using rule 14 (BVALOR -> XVALOR .)
+    SUB             reduce using rule 14 (BVALOR -> XVALOR .)
+    TD              reduce using rule 14 (BVALOR -> XVALOR .)
+    WD              reduce using rule 14 (BVALOR -> XVALOR .)
+    WORD            reduce using rule 14 (BVALOR -> XVALOR .)
+    RESB            reduce using rule 14 (BVALOR -> XVALOR .)
+    RESW            reduce using rule 14 (BVALOR -> XVALOR .)
+    END             reduce using rule 14 (BVALOR -> XVALOR .)
+
+
+state 56
+
+    (12) DBYTE -> BYTE BVALOR .
+
+    ETIQUETA        reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    BYTE            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    RSUB            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    ADD             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    AND             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    COMP            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    DIV             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    J               reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    JEQ             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    JGT             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    JLT             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    JSUB            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    LDA             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    LDCH            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    LDL             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    LDX             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    MUL             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    OR              reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    RD              reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    TIX             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    STA             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    STCH            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    STL             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    STSW            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    STX             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    SUB             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    TD              reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    WD              reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    WORD            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    RESB            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    RESW            reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+    END             reduce using rule 12 (DBYTE -> BYTE BVALOR .)
+
+
+state 57
+
+    (15) BVALOR -> error .
+
+    ETIQUETA        reduce using rule 15 (BVALOR -> error .)
+    BYTE            reduce using rule 15 (BVALOR -> error .)
+    RSUB            reduce using rule 15 (BVALOR -> error .)
+    ADD             reduce using rule 15 (BVALOR -> error .)
+    AND             reduce using rule 15 (BVALOR -> error .)
+    COMP            reduce using rule 15 (BVALOR -> error .)
+    DIV             reduce using rule 15 (BVALOR -> error .)
+    J               reduce using rule 15 (BVALOR -> error .)
+    JEQ             reduce using rule 15 (BVALOR -> error .)
+    JGT             reduce using rule 15 (BVALOR -> error .)
+    JLT             reduce using rule 15 (BVALOR -> error .)
+    JSUB            reduce using rule 15 (BVALOR -> error .)
+    LDA             reduce using rule 15 (BVALOR -> error .)
+    LDCH            reduce using rule 15 (BVALOR -> error .)
+    LDL             reduce using rule 15 (BVALOR -> error .)
+    LDX             reduce using rule 15 (BVALOR -> error .)
+    MUL             reduce using rule 15 (BVALOR -> error .)
+    OR              reduce using rule 15 (BVALOR -> error .)
+    RD              reduce using rule 15 (BVALOR -> error .)
+    TIX             reduce using rule 15 (BVALOR -> error .)
+    STA             reduce using rule 15 (BVALOR -> error .)
+    STCH            reduce using rule 15 (BVALOR -> error .)
+    STL             reduce using rule 15 (BVALOR -> error .)
+    STSW            reduce using rule 15 (BVALOR -> error .)
+    STX             reduce using rule 15 (BVALOR -> error .)
+    SUB             reduce using rule 15 (BVALOR -> error .)
+    TD              reduce using rule 15 (BVALOR -> error .)
+    WD              reduce using rule 15 (BVALOR -> error .)
+    WORD            reduce using rule 15 (BVALOR -> error .)
+    RESB            reduce using rule 15 (BVALOR -> error .)
+    RESW            reduce using rule 15 (BVALOR -> error .)
+    END             reduce using rule 15 (BVALOR -> error .)
+
+
+state 58
+
+    (6) C -> CP C .
+
+    END             reduce using rule 6 (C -> CP C .)
+
+
+state 59
+
+    (19) NEMDIRECTIVA -> NEMONICO DECIMAL .
+
+    ETIQUETA        reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    BYTE            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    RSUB            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    ADD             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    AND             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    COMP            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    DIV             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    J               reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    JEQ             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    JGT             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    JLT             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    JSUB            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    LDA             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    LDCH            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    LDL             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    LDX             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    MUL             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    OR              reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    RD              reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    TIX             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    STA             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    STCH            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    STL             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    STSW            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    STX             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    SUB             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    TD              reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    WD              reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    WORD            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    RESB            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    RESW            reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+    END             reduce using rule 19 (NEMDIRECTIVA -> NEMONICO DECIMAL .)
+
+
+state 60
+
+    (18) NEMDIRECTIVA -> NEMONICO HEX .
+
+    ETIQUETA        reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    BYTE            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    RSUB            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    ADD             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    AND             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    COMP            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    DIV             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    J               reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    JEQ             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    JGT             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    JLT             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    JSUB            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    LDA             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    LDCH            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    LDL             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    LDX             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    MUL             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    OR              reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    RD              reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    TIX             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    STA             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    STCH            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    STL             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    STSW            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    STX             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    SUB             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    TD              reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    WD              reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    WORD            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    RESB            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    RESW            reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+    END             reduce using rule 18 (NEMDIRECTIVA -> NEMONICO HEX .)
+
+
+state 61
+
+    (20) NEMDIRECTIVA -> NEMONICO error .
+
+    ETIQUETA        reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    BYTE            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    RSUB            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    ADD             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    AND             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    COMP            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    DIV             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    J               reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    JEQ             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    JGT             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    JLT             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    JSUB            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    LDA             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    LDCH            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    LDL             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    LDX             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    MUL             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    OR              reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    RD              reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    TIX             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    STA             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    STCH            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    STL             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    STSW            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    STX             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    SUB             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    TD              reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    WD              reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    WORD            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    RESB            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    RESW            reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+    END             reduce using rule 20 (NEMDIRECTIVA -> NEMONICO error .)
+
+
+state 62
+
+    (27) CI -> INSTRUCCION ETIQUETA DIR .
+
+    ETIQUETA        reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    BYTE            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    RSUB            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    ADD             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    AND             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    COMP            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    DIV             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    J               reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    JEQ             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    JGT             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    JLT             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    JSUB            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    LDA             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    LDCH            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    LDL             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    LDX             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    MUL             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    OR              reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    RD              reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    TIX             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    STA             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    STCH            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    STL             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    STSW            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    STX             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    SUB             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    TD              reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    WD              reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    WORD            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    RESB            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    RESW            reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+    END             reduce using rule 27 (CI -> INSTRUCCION ETIQUETA DIR .)
+
+
+state 63
+
+    (11) DBYTE -> ETIQUETA BYTE BVALOR .
+
+    ETIQUETA        reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    BYTE            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    RSUB            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    ADD             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    AND             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    COMP            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    DIV             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    J               reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    JEQ             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    JGT             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    JLT             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    JSUB            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    LDA             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    LDCH            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    LDL             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    LDX             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    MUL             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    OR              reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    RD              reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    TIX             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    STA             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    STCH            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    STL             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    STSW            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    STX             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    SUB             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    TD              reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    WD              reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    WORD            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    RESB            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    RESW            reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+    END             reduce using rule 11 (DBYTE -> ETIQUETA BYTE BVALOR .)
+
+
+state 64
+
+    (3) DE -> END ETIQUETA .
+
+    $end            reduce using rule 3 (DE -> END ETIQUETA .)
+

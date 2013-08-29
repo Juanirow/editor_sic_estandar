@@ -73,10 +73,6 @@ scann = lex.lex()
 scann.errors = []
 scann.list_error_line = []
 
-def ini_lexic_errors():
-	scann = lex.lex()
-	scann.errors = []
-	scann.list_error_line = []
 
 def entrada(texto):
 	scann = lex.lex()
