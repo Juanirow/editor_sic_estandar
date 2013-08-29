@@ -23,6 +23,7 @@ class Ensamblador:
 		parser.list_line_errors = []
 		parser.scann.errors = []
 		parser.scann.list_error_line = []
+		parser.scann.lineno = 1
 		parse.parse(text)
 
 	def get_all_errors(self):
@@ -32,8 +33,19 @@ class Ensamblador:
 		return len(self.get_all_errors())
 
 	def get_errors_string(self):
-		errors = self.get_all_errors()
 		text = ""
-		for n in errors:
-			text += n
+		errors = self.get_scanner_errors()
+		if len(errors) == 0:
+			text = "Sin Errores Lexicos\n"
+		else:
+			text = "\t===Errores Lexicos===\n"
+			for n in errors:
+				text += n
+		errors = self.get_parser_errors()
+		if len(errors) == 0:
+			text += "Sin Errores Sintacticos\n"
+		else:
+			text += "\t===Errores Sintacticos===\n"
+			for n in errors:
+				text += n
 		return text

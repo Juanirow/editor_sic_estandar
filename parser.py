@@ -38,7 +38,7 @@ def p_directiva_start(p):
   '''
   s = p[3]
   if compare_string_number(s):
-    errors.append("En la linea 1: \n\tLa direccion inicial debe ser mayor a cero\n")
+    errors.append("\nEn la linea 1: \n\tLa direccion inicial debe ser mayor a cero\n")
 
 
 #metodo que compara si una cadena (hexadecimal) es igual a 0
@@ -94,7 +94,7 @@ def p_byte_valor(p):
 
 def p_byte_valor_error(p):
   'BVALOR : error'
-  errors.append("En la linea:"+str(p.lineno(1))+"\n\t Al definir la constante en la directiva Byte")
+  errors.append("\nEn la linea:"+str(p.lineno(1))+"\n\t Al definir la constante en la directiva Byte")
 
 def p_directivas(p):
   '''
@@ -112,7 +112,7 @@ def p_nemonico_directivas(p):
 
 def p_nemonico_directivas_error(p):
   '''NEMDIRECTIVA : NEMONICO error '''
-  errors.append("En la linea:"+str(p.lineno(2))+"\n\t Se esperaba un numero decimal o hexadecimal")
+  errors.append("\nEn la linea:"+str(p.lineno(2))+"\n\t Se esperaba un numero decimal o hexadecimal")
   pass
 
 def p_nemonico(p):
@@ -169,7 +169,7 @@ def p_error(t):
     line_error = str(t.lexer.lineno)
     if not line_error in list_line_errors:
       token = get_token(t.value)
-      error ="En la linea: " + line_error+" cerca de: "+token
+      error ="\nEn la linea: " + line_error+" cerca de: "+token+"\n"
       errors.append(error)
       list_line_errors.append(line_error)
       yacc.errok()
