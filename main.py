@@ -30,6 +30,7 @@ class Window_Form(QtGui.QMainWindow):
             self.textbox.close()
             self.set_statusBar_Text("Cerrando archivo")
         self.close_text_errors()
+        self.file = None
 
     def close_text_errors(self):
         if self.textbox_errors:
@@ -78,7 +79,7 @@ class Window_Form(QtGui.QMainWindow):
             self.set_statusBar_Text("archivo guardado")
 
     def is_file_open(self):
-        if self.textbox:
+        if self.file:
             return True
         return False
 
@@ -103,11 +104,14 @@ class Window_Form(QtGui.QMainWindow):
                 del e
             else:
                 self.set_statusBar_Text("No se puede compilar el archivo no es un .s")
+        else: 
+            self.set_statusBar_Text("No hay un archivo por compilar")
 
 
     def show_textBox_errors(self,e):
         text = "No se detecto ningun error"
-        if e.num_errors() > 0:
+        num_errors = e.num_errors()
+        if num_errors > 0:
             if self.textbox_errors:
                 self.textbox_errors.close()
             text = e.get_errors_string()
@@ -115,6 +119,7 @@ class Window_Form(QtGui.QMainWindow):
             self.textbox_errors.setGeometry(400,35,800,545)
             self.textbox_errors.setText(text)
             self.textbox_errors.show()
+            self.set_statusBar_Text("Se detectaron "+str(num_errors)+" errores")
         else:
             self.set_statusBar_Text(text)
         return text 
