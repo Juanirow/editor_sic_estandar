@@ -4,6 +4,10 @@ from PyQt4 import QtCore, QtGui
 from my_file import File 
 from ensamblador import Ensamblador
 import scanner
+from Cargador import Cargador
+import os
+
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -17,13 +21,21 @@ class Window_Form(QtGui.QMainWindow):
         self.file = None
         self.textbox = None
         self.textbox_errors = None
+        self.textbox_obj = None
+        self.cargador = None
         QtCore.QObject.connect(self.window.actionAbrir, QtCore.SIGNAL("triggered()"), self.open_file)
         QtCore.QObject.connect(self.window.actionNuevo, QtCore.SIGNAL("triggered()"), self.create_file)
         QtCore.QObject.connect(self.window.actionGuardar, QtCore.SIGNAL("triggered()"), self.save_file)
         QtCore.QObject.connect(self.window.actionSalir, QtCore.SIGNAL("triggered()"), self.close)
         QtCore.QObject.connect(self.window.actionCerrar, QtCore.SIGNAL("triggered()"), self.close_file)
-        QtCore.QObject.connect(self.window.actionCompilar, QtCore.SIGNAL("triggered()"), self.compile)
+        QtCore.QObject.connect(self.window.actionEnsamblar, QtCore.SIGNAL("triggered()"), self.compile)
+        QtCore.QObject.connect(self.window.actionCargar, QtCore.SIGNAL("triggered()"), self.cargar)
 
+    def cargar(self):
+        if self.is_file_open():
+            self.cargador = Cargador()
+            self.cargador.show()
+            self.cargador.load_file_name(self.file)
 
     def close_file(self):
         if self.textbox:
@@ -61,7 +73,7 @@ class Window_Form(QtGui.QMainWindow):
 
     def open_file(self):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Abrir Archivo', 
-                '/home')
+                '/home/Desktop/Progra/EditorSIC/ejemplos')
         if fname:
             f = open(fname,"r")
             text = f.read()
@@ -89,40 +101,43 @@ class Window_Form(QtGui.QMainWindow):
         if self.is_file_open():
             fc = File()
             if fc.is_extension_valid(self.file,'s'):
-                e = Ensamblador()
-                self.close_text_errors()
-                text = self.textbox.toPlainText()
-                text = str(text)
-                e.analiza(text)
-                text = self.show_textBox_errors(e)
-                fo = File()
-                fc.open(self.file)
-                fc.close()
-                fo.create_file(fc.name,'t')
-                fo.write(text)
-                fo.close()
-                del e
+                file_name = fc.get_file_name(self.file)
+                file_name = fc.name
+                self.file = fc.name
+                self.set_statusBar_Text("Compilando")                
+                os.system("python principal.py "+str(self.file))
+                self.set_statusBar_Text("Cargando archivo intermedio "+file_name)
+                file_error = open(file_name+".t")
+                text_errors = file_error.read()
+                self.show_textBox_errors(text_errors)
+                self.set_statusBar_Text("Cargando archivo objeto "+file_name+".os")
+                if os.path.isfile(file_name+".os"):
+                    file_obj = open(file_name+".os")
+                    obj_text = file_obj.read()
+                    self.show_textBox_obj(obj_text)
+                self.set_statusBar_Text("Se termino el ensablado de "+file_name+".s")
             else:
                 self.set_statusBar_Text("No se puede compilar el archivo no es un .s")
         else: 
             self.set_statusBar_Text("No hay un archivo por compilar")
 
 
-    def show_textBox_errors(self,e):
-        text = "No se detecto ningun error"
-        num_errors = e.num_errors()
-        if num_errors > 0:
-            if self.textbox_errors:
-                self.textbox_errors.close()
-            text = e.get_errors_string()
-            self.textbox_errors = QtGui.QTextEdit(self)
-            self.textbox_errors.setGeometry(400,35,800,545)
-            self.textbox_errors.setText(text)
-            self.textbox_errors.show()
-            self.set_statusBar_Text("Se detectaron "+str(num_errors)+" errores")
-        else:
-            self.set_statusBar_Text(text)
-        return text 
+    def show_textBox_errors(self,errors):
+        if self.textbox_errors:
+            self.textbox_errors.close()
+        self.textbox_errors = QtGui.QTextEdit(self)
+        self.textbox_errors.setGeometry(400,35,800,270)
+        self.textbox_errors.setText(errors)
+        self.textbox_errors.show()
+
+    def show_textBox_obj(self,text):
+        if self.textbox_obj:
+            self.textbox_obj.close()
+        self.textbox_obj = QtGui.QTextEdit(self)
+        self.textbox_obj.setGeometry(400,280,800,525)
+        self.textbox_obj.setText(text)
+        self.textbox_obj.show()
+
 
     
 

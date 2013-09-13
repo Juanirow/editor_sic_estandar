@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'windowapp.ui'
 #
-# Created: Wed Aug 28 17:01:32 2013
+# Created: Wed Sep 11 09:04:49 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_windowApp(object):
     def setupUi(self, windowApp):
         windowApp.setObjectName(_fromUtf8("windowApp"))
-        windowApp.resize(800, 600)
+        windowApp.resize(1000, 700)
         self.centralWidget = QtGui.QWidget(windowApp)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
         windowApp.setCentralWidget(self.centralWidget)
@@ -37,31 +37,36 @@ class Ui_windowApp(object):
         windowApp.setStatusBar(self.statusBar)
         self.actionNuevo = QtGui.QAction(windowApp)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("./images/new.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("../EditorSIC/images/new.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionNuevo.setIcon(icon)
         self.actionNuevo.setObjectName(_fromUtf8("actionNuevo"))
         self.actionAbrir = QtGui.QAction(windowApp)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(_fromUtf8("./images/open.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(_fromUtf8("../../../Downloads/open.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionAbrir.setIcon(icon1)
         self.actionAbrir.setObjectName(_fromUtf8("actionAbrir"))
         self.actionGuardar = QtGui.QAction(windowApp)
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(_fromUtf8("./images/save.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(_fromUtf8("../../../Downloads/save.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionGuardar.setIcon(icon2)
         self.actionGuardar.setObjectName(_fromUtf8("actionGuardar"))
         self.actionCerrar = QtGui.QAction(windowApp)
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(_fromUtf8("./images/cancel.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(_fromUtf8("../../../Downloads/cancel.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionCerrar.setIcon(icon3)
         self.actionCerrar.setObjectName(_fromUtf8("actionCerrar"))
         self.actionSalir = QtGui.QAction(windowApp)
         self.actionSalir.setObjectName(_fromUtf8("actionSalir"))
-        self.actionCompilar = QtGui.QAction(windowApp)
+        self.actionEnsamblar = QtGui.QAction(windowApp)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(_fromUtf8("./images/build.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionCompilar.setIcon(icon4)
-        self.actionCompilar.setObjectName(_fromUtf8("actionCompilar"))
+        icon4.addPixmap(QtGui.QPixmap(_fromUtf8("../../../Downloads/build.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionEnsamblar.setIcon(icon4)
+        self.actionEnsamblar.setObjectName(_fromUtf8("actionEnsamblar"))
+        self.actionCargar = QtGui.QAction(windowApp)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(_fromUtf8("../EditorSIC/images/cargar.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionCargar.setIcon(icon5)
+        self.actionCargar.setObjectName(_fromUtf8("actionCargar"))
         self.menuArchivo.addSeparator()
         self.menuArchivo.addAction(self.actionNuevo)
         self.menuArchivo.addSeparator()
@@ -70,7 +75,8 @@ class Ui_windowApp(object):
         self.menuArchivo.addAction(self.actionCerrar)
         self.menuArchivo.addSeparator()
         self.menuArchivo.addAction(self.actionSalir)
-        self.menuCompilador.addAction(self.actionCompilar)
+        self.menuCompilador.addAction(self.actionEnsamblar)
+        self.menuCompilador.addAction(self.actionCargar)
         self.menuBar.addAction(self.menuArchivo.menuAction())
         self.menuBar.addAction(self.menuCompilador.menuAction())
         self.mainToolBar.addAction(self.actionNuevo)
@@ -79,7 +85,8 @@ class Ui_windowApp(object):
         self.mainToolBar.addAction(self.actionGuardar)
         self.mainToolBar.addAction(self.actionCerrar)
         self.mainToolBar.addSeparator()
-        self.mainToolBar.addAction(self.actionCompilar)
+        self.mainToolBar.addAction(self.actionEnsamblar)
+        self.mainToolBar.addAction(self.actionCargar)
 
         self.retranslateUi(windowApp)
         QtCore.QMetaObject.connectSlotsByName(windowApp)
@@ -93,5 +100,7 @@ class Ui_windowApp(object):
         self.actionGuardar.setText(QtGui.QApplication.translate("windowApp", "Guardar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionCerrar.setText(QtGui.QApplication.translate("windowApp", "Cerrar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSalir.setText(QtGui.QApplication.translate("windowApp", "Salir", None, QtGui.QApplication.UnicodeUTF8))
-        self.actionCompilar.setText(QtGui.QApplication.translate("windowApp", "Compilar", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionEnsamblar.setText(QtGui.QApplication.translate("windowApp", "Ensamblar", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionEnsamblar.setToolTip(QtGui.QApplication.translate("windowApp", "Ensamblar", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCargar.setText(QtGui.QApplication.translate("windowApp", "Cargar", None, QtGui.QApplication.UnicodeUTF8))
 

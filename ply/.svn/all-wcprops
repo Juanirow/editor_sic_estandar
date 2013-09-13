@@ -1,35 +1,35 @@
 K 25
 svn:wc:ra_dav:version-url
-V 42
-/lab/!svn/ver/89/jmhernandez/practica1/ply
-END
-lex.py
-K 25
-svn:wc:ra_dav:version-url
-V 49
-/lab/!svn/ver/89/jmhernandez/practica1/ply/lex.py
+V 43
+/lab/!svn/ver/300/jmhernandez/practica3/ply
 END
 __init__.py
 K 25
 svn:wc:ra_dav:version-url
-V 54
-/lab/!svn/ver/89/jmhernandez/practica1/ply/__init__.py
+V 55
+/lab/!svn/ver/300/jmhernandez/practica3/ply/__init__.py
 END
 yacc.py
 K 25
 svn:wc:ra_dav:version-url
-V 50
-/lab/!svn/ver/89/jmhernandez/practica1/ply/yacc.py
+V 51
+/lab/!svn/ver/300/jmhernandez/practica3/ply/yacc.py
 END
 cpp.py
 K 25
 svn:wc:ra_dav:version-url
-V 49
-/lab/!svn/ver/89/jmhernandez/practica1/ply/cpp.py
+V 50
+/lab/!svn/ver/300/jmhernandez/practica3/ply/cpp.py
 END
 ctokens.py
 K 25
 svn:wc:ra_dav:version-url
-V 53
-/lab/!svn/ver/89/jmhernandez/practica1/ply/ctokens.py
+V 54
+/lab/!svn/ver/300/jmhernandez/practica3/ply/ctokens.py
+END
+lex.py
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/lab/!svn/ver/300/jmhernandez/practica3/ply/lex.py
 END
