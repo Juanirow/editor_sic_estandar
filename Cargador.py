@@ -2,6 +2,7 @@ from PyQt4 import QtCore, QtGui
 from windowcargador import Ui_DockWidget
 from hexadecimal import Hexadecimal
 from convert import Convert
+from register import Register
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -17,22 +18,43 @@ class Cargador(QtGui.QDockWidget):
         self.header = None
         self.registers = None
         self.end = None
+        self.rows_count = None
         self.hex = Hexadecimal()
-
+        self.window.btnSimular.clicked.connect(self.simular)
+        
+    def simular(self):
+        num_actions = self.get_count_next_actions()
+        if num_actions == -1:
+            self.window.textEdit_Actions.setText("Numero de simulaciones no Validas")
+        else:
+            self.make_n_simulations(num_actions)
+            
+    def make_n_simulations(self,number):
+        
+    
+    def get_count_next_actions(self):
+        count_actions = str(self.window.textEdit_Num.toPlainText())
+        if count_actions == "":
+            count_actions = 0
+        elif not count_actions.isdigit():
+            return -1
+        return int(count_actions)
+        
     def get_list_register(self):
-		f = open(self.file_name)
-		text = f.read()
-		list = text.split("\n")
-		return list
+        f = open(self.file_name)
+        text = f.read()
+        list = text.split("\n")
+        list.remove("")
+        return list
 
     def load_file_name(self,file_name):
         self.file_name = file_name+".os"
         list = self.get_list_register()
         self.header = list[0]
         self.end = list[-1]
-        self.registers = list[1:-2]
+        self.registers = list[1:-1]
         self.charge_in_memory()
-
+        
     def charge_text(self):
         c = Convert()        
         for r in self.registers:
@@ -43,7 +65,6 @@ class Cargador(QtGui.QDockWidget):
             col = int(c.to_decimal(col_start)  + 1) 
             res = self.hex.subs(init[:-1],self.init[:-1])
             dec_res = int(c.to_decimal(res))
-#            print init,self.init,res,dec_res,col
             while index < len(string):
                 byte = string[index:index+2]
                 item = QtGui.QTableWidgetItem(byte)
@@ -54,7 +75,6 @@ class Cargador(QtGui.QDockWidget):
                     col = 1
                     dec_res += 1
             
-    
     def charge_header(self):
         init = self.header[7:13]
         self.init = init
@@ -67,14 +87,43 @@ class Cargador(QtGui.QDockWidget):
         self.window.tableWidget.setRowCount(num_rows+1)
         it = 0
         while it <= num_rows:
-            item = QtGui.QTableWidgetItem(index+"0H")
+            dir = index+"0H"
+            r = Register("T")
+            dir = r.adjust_bytes(dir,6)
+            item = QtGui.QTableWidgetItem(dir)
             self.window.tableWidget.setItem(it,0,item)
             it += 1
             index = self.hex.plus(index,"1H")[:-1]
+    
+    def charge_end_file(self):
+        dir = self.end[1:]
+        dir = self.hex.change_hexadecimal(dir)
+        item = QtGui.QTableWidgetItem(dir)
+        self.window.tableWidget_2.setItem(0,0,item)
+        it = 1
+        while it < 5:
+            item = QtGui.QTableWidgetItem("007FFFH")
+            self.window.tableWidget_2.setItem(it,0,item)
+            it += 1
+        
 
     def charge_in_memory(self):
         self.charge_header()
         self.charge_text()
+        self.charge_end_file()
+        self.init_empty_rows()
+        
+    def init_empty_rows(self):
+        rows_count = self.window.tableWidget.rowCount()
+        colum_count = self.window.tableWidget.columnCount()
+        for i in range(rows_count):
+            for j in range(colum_count):
+                item = self.window.tableWidget.item(i,j)                
+                if item == None:
+                    item_text = QtGui.QTableWidgetItem("FF")
+                    self.window.tableWidget.setItem(i,j,item_text)
+            
+        
 
 	
 

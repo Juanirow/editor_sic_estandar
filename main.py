@@ -2,8 +2,6 @@ from windowapp import Ui_windowApp
 import sys
 from PyQt4 import QtCore, QtGui
 from my_file import File 
-from ensamblador import Ensamblador
-import scanner
 from Cargador import Cargador
 import os
 
@@ -19,6 +17,7 @@ class Window_Form(QtGui.QMainWindow):
         self.window = Ui_windowApp()
         self.window.setupUi(self)
         self.file = None
+        self.file_name = None
         self.textbox = None
         self.textbox_errors = None
         self.textbox_obj = None
@@ -35,7 +34,7 @@ class Window_Form(QtGui.QMainWindow):
         if self.is_file_open():
             self.cargador = Cargador()
             self.cargador.show()
-            self.cargador.load_file_name(self.file)
+            self.cargador.load_file_name(self.file_name)
 
     def close_file(self):
         if self.textbox:
@@ -58,7 +57,7 @@ class Window_Form(QtGui.QMainWindow):
         if self.textbox:
             self.textbox.close()
         self.textbox = QtGui.QTextEdit(self)
-        self.textbox.setGeometry(0,35,395,545)
+        self.textbox.setGeometry(0,35,395,630)
         self.textbox.setText(text)
         self.textbox.show()
     
@@ -101,21 +100,20 @@ class Window_Form(QtGui.QMainWindow):
         if self.is_file_open():
             fc = File()
             if fc.is_extension_valid(self.file,'s'):
-                file_name = fc.get_file_name(self.file)
-                file_name = fc.name
-                self.file = fc.name
-                self.set_statusBar_Text("Compilando")                
+                self.file_name = fc.get_file_name(self.file)
+                self.file_name = fc.name
+                self.set_statusBar_Text("Compilando") 
                 os.system("python principal.py "+str(self.file))
-                self.set_statusBar_Text("Cargando archivo intermedio "+file_name)
-                file_error = open(file_name+".t")
+                self.set_statusBar_Text("Cargando archivo intermedio "+self.file_name)              
+                file_error = open(self.file_name+".t")
                 text_errors = file_error.read()
                 self.show_textBox_errors(text_errors)
-                self.set_statusBar_Text("Cargando archivo objeto "+file_name+".os")
-                if os.path.isfile(file_name+".os"):
-                    file_obj = open(file_name+".os")
+                self.set_statusBar_Text("Cargando archivo objeto "+self.file_name+".os")
+                if os.path.isfile(self.file_name+".os"):
+                    file_obj = open(self.file_name+".os")
                     obj_text = file_obj.read()
                     self.show_textBox_obj(obj_text)
-                self.set_statusBar_Text("Se termino el ensablado de "+file_name+".s")
+                self.set_statusBar_Text("Se termino el ensablado de "+self.file_name+".s")
             else:
                 self.set_statusBar_Text("No se puede compilar el archivo no es un .s")
         else: 
@@ -126,7 +124,7 @@ class Window_Form(QtGui.QMainWindow):
         if self.textbox_errors:
             self.textbox_errors.close()
         self.textbox_errors = QtGui.QTextEdit(self)
-        self.textbox_errors.setGeometry(400,35,800,270)
+        self.textbox_errors.setGeometry(400,35,800,350)
         self.textbox_errors.setText(errors)
         self.textbox_errors.show()
 
@@ -134,12 +132,9 @@ class Window_Form(QtGui.QMainWindow):
         if self.textbox_obj:
             self.textbox_obj.close()
         self.textbox_obj = QtGui.QTextEdit(self)
-        self.textbox_obj.setGeometry(400,280,800,525)
+        self.textbox_obj.setGeometry(400,480,800,510)
         self.textbox_obj.setText(text)
         self.textbox_obj.show()
-
-
-    
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
