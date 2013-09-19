@@ -53,6 +53,73 @@ class Hexadecimal:
             return num
         else:
             return num+"H"
+    
+    def minus_than(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)
+        del convert
+        return num1<num2
+        
+    def and_op(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)
+        res = int(num1)&int(num2)
+        res = convert.decimal_to_hexadecimal(res)
+        del convert
+        return res
+    def or_op(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)
+        res = int(num1)|int(num2)
+        res = convert.decimal_to_hexadecimal(res)
+        del convert
+        return res
+        
+    def cmp_op(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)
+        ret = "="
+        if num1 < num2:
+            ret = "<"
+        elif num1 > num2:
+            ret = ">"
+        del convert
+        return ret
+        
+    def div(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)
+        res = int(num1)/int(num2)
+        res = convert.decimal_to_hexadecimal(res)
+        del convert
+        return res
+        
+    def mul(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)
+        res = int(num1)*int(num2)
+        res = convert.decimal_to_hexadecimal(res)
+        del convert
+        return res
+    
             
 #hex = Hexadecimal()
 #print hex.plus("0H","23H")
