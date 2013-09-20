@@ -3,6 +3,7 @@ from windowcargador import Ui_DockWidget
 from hexadecimal import Hexadecimal
 from convert import Convert
 from register import Register
+from step2 import Step2
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -29,7 +30,15 @@ class Cargador(QtGui.QDockWidget):
                            "30":self.jeq,"34":self.jgt,"38":self.jlt,
                            "48":self.jsub,"50":self.ldch,"08":self.ldl,
                            "04":self.ldx,"20":self.mul,"4C":self.rsub,
-                           "0C":self.sta}
+                           "0C":self.sta,"54":self.stch,"14":self.stl,
+                           "E8":self.stsw,"10":self.stx,"1C":self.sub,"2C":self.tix}
+        self.operations_text = {"18":"ADD","00":"LDA","40":"AND",
+                           "28":"COMP","24":"DIV","3C":"J",
+                           "30":"JEQ","34":"JGT","38":"JLT",
+                           "48":"JSUB","50":"LDCH","08":"LDL",
+                           "04":"LDX","20":"MUL","4C":"RSUB",
+                           "0C":"STA","54":"STCH","14":"STL",
+                           "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX"}
         
         
     def simular(self):
@@ -137,6 +146,8 @@ class Cargador(QtGui.QDockWidget):
         m = self.hex.change_hexadecimal(m)
         if self.cc == "=":
             self.set_cp_value(m)
+        else:
+            self.increment_cp(3)
         self.window.textEdit_Actions.setText(string)
     
     def jgt(self,m):
@@ -147,6 +158,8 @@ class Cargador(QtGui.QDockWidget):
         m = self.hex.change_hexadecimal(m)
         if self.cc == ">":
             self.set_cp_value(m)
+        else:
+            self.increment_cp(3)
         self.window.textEdit_Actions.setText(string)
     
     def jlt(self,m):
@@ -157,6 +170,8 @@ class Cargador(QtGui.QDockWidget):
         m = self.hex.change_hexadecimal(m)
         if self.cc == "<":
             self.set_cp_value(m)
+        else:
+            self.increment_cp(3)
         self.window.textEdit_Actions.setText(string)
     
     def jsub(self,m):
@@ -244,7 +259,132 @@ class Cargador(QtGui.QDockWidget):
         self.window.textEdit_Actions.setText(string)
     
     def sta(self,m):
-        print m
+        string = "STA\nm..m+2<-(A)\nm="+str(m)+"\n"
+        it = 0
+        row = self.get_row_index(m)
+        col = self.get_column_index(m)
+        a = self.get_a_value()
+        string += "(A)="+str(a)
+        index = 0
+        while it < 3:
+            val = a[index:index+2]
+            index += 2
+            item_text = QtGui.QTableWidgetItem(val)
+            self.window.tableWidget.setItem(row,col,item_text)
+            col = (col+1)%17
+            if col == 0:
+                col = 1 
+                row += 1
+            it += 1
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+    
+    def stch(self,m):
+        string = "STCH\nm<-(A)[+der]\nm="+str(m)+"\n"
+        row = self.get_row_index(m)
+        col = self.get_column_index(m)
+        print row,col,m
+        a = self.get_a_value()
+        a = self.reg.filter_number(a)
+        a_der = str(a)[-2:]
+        string += "(A)[+der]="+ a_der
+        item = QtGui.QTableWidgetItem(a_der)
+        self.window.tableWidget.setItem(row,col,item)
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+        
+    def stl(self,m):
+        string = "STL\nm..m+2<-(L)\nm="+str(m)+"\n"
+        it = 0
+        row = self.get_row_index(m)
+        col = self.get_column_index(m)
+        l = self.get_l_value()
+        string += "(l)="+str(l)
+        index = 0
+        while it < 3:
+            val = l[index:index+2]
+            index += 2
+            item_text = QtGui.QTableWidgetItem(val)
+            self.window.tableWidget.setItem(row,col,item_text)
+            col = (col+1)%17
+            if col == 0:
+                col = 1 
+                row += 1
+            it += 1
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+        
+    def stsw(self,m):
+        string = "STSW\nm..m+2<-(SW)\nm="+str(m)+"\n"
+        it = 0
+        row = self.get_row_index(m)
+        col = self.get_column_index(m)
+        sw = self.get_sw_value()
+        string += "(SW)="+str(sw)
+        index = 0
+        while it < 3:
+            val = sw[index:index+2]
+            index += 2
+            item_text = QtGui.QTableWidgetItem(val)
+            self.window.tableWidget.setItem(row,col,item_text)
+            col = (col+1)%17
+            if col == 0:
+                col = 1 
+                row += 1
+            it += 1
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+        
+    def stx(self,m):
+        string = "STSX\nm..m+2<-(X)\nm="+str(m)+"\n"
+        it = 0
+        row = self.get_row_index(m)
+        col = self.get_column_index(m)
+        x = self.get_x_value()
+        string += "(X)="+str(x)
+        index = 0
+        while it < 3:
+            val = x[index:index+2]
+            index += 2
+            item_text = QtGui.QTableWidgetItem(val)
+            self.window.tableWidget.setItem(row,col,item_text)
+            col = (col+1)%17
+            if col == 0:
+                col = 1 
+                row += 1
+            it += 1
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+        
+    def sub(self,m):
+        a = self.get_a_value()
+        string = "SUB: \nCP = 1C"+ str(m)+"\n"
+        string +="A = "+str(a)+"\n"
+        string +="m ="+str(m)+"\n"
+        m = self.get_mem_value(m)
+        string += "(m..m+2)="+str(m)+"\n"
+        a = self.hex.subs(a,m)
+        string += "A <- A - (m...m+2)"+"\n"
+        a = self.reg.adjust_bytes(a,6)
+        string += "A = "+str(a)+"\n"
+        self.set_a_value(a)
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+        
+    def tix(self,m):
+        string = "TIX\nX<-(X)+1;(X):(m,,m+2)\n"
+        x = self.get_x_value()
+        string += "X ="+str(x)+"+1\n"        
+        x = self.hex.plus(x,"1H")
+        string += "X ="+str(x)+"\n"
+        self.set_x_value(x)
+        m = self.get_mem_value(m)
+        string += "(m..m+2) +"+str(m)+"\n"
+        self.cc = self.hex.cmp_op(x,m)
+        string += "(X):(m..m+2)\nCC="+self.cc
+        self.increment_cp(3)
+        self.window.textEdit_Actions.setText(string)
+        
     
     def increment_cp(self,num):
         c = Convert()        
@@ -256,13 +396,16 @@ class Cargador(QtGui.QDockWidget):
 
     def get_address_tarjet(self,value):
         c = Convert()       
-        addressing = value[0]
-        addressing = c.to_decimal(addressing)
-        val = value       
-        if (addressing & 1) == 1:
+        addressing = value[0]+"H"
+        addressing = int(c.to_decimal(addressing))
+        val = value
+        bina = c.decimal_to_binary(addressing,4)
+        bina = c.mask_and(bina,"1000")
+        if bina == "1000":
             val = self.hex.subs(value,"8000H") 
             x = self.get_x_value()
             val = self.hex.plus(val,x)
+            val = self.reg.filter_number(val)
         return val
 
     def set_a_value(self,value):
@@ -295,6 +438,16 @@ class Cargador(QtGui.QDockWidget):
         item_text = QtGui.QTableWidgetItem(value)
         self.window.tableWidget_2.setItem(2,0,item_text)
         
+    def get_sw_value(self):
+        item = self.window.tableWidget_2.item(4,0)
+        return str(item.text())
+    
+    def set_sw_value(self,value):
+        value = self.reg.adjust_bytes(value,6)
+        value = self.hex.change_hexadecimal(value)
+        item_text = QtGui.QTableWidgetItem(value)
+        self.window.tableWidget_2.setItem(4,0,item_text)   
+        
     def get_CP_value(self):
         item = self.window.tableWidget_2.item(0,0)
         return str(item.text())
@@ -303,7 +456,15 @@ class Cargador(QtGui.QDockWidget):
         cp = self.reg.adjust_bytes(cp,6)
         cp = self.hex.change_hexadecimal(cp)
         item_text = QtGui.QTableWidgetItem(cp)
-        self.window.tableWidget_2.setItem(0,0,item_text)  
+        self.window.tableWidget_2.setItem(0,0,item_text)
+        self.get_next_text_instruction()
+    
+    def get_next_text_instruction(self):
+        cp = self.get_CP_value()
+        mem = self.get_mem_value(cp)
+        cod = mem[0:2]
+        op = self.operations_text.get(str(cod),"FIN")
+        self.window.label_sig.setText(op)
     
         
     def get_row_index(self,value):
@@ -417,6 +578,7 @@ class Cargador(QtGui.QDockWidget):
         dir = self.hex.change_hexadecimal(dir)
         item = QtGui.QTableWidgetItem(dir)
         self.window.tableWidget_2.setItem(0,0,item)
+        self.get_next_text_instruction()
         it = 1
         while it < 5:
             item = QtGui.QTableWidgetItem("007FFFH")

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'windowcargador.ui'
 #
-# Created: Tue Sep 17 21:56:21 2013
+# Created: Fri Sep 20 00:09:00 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -95,6 +95,12 @@ class Ui_DockWidget(object):
         self.textEdit_Actions = QtGui.QTextEdit(self.dockWidgetContents)
         self.textEdit_Actions.setGeometry(QtCore.QRect(240, 410, 421, 251))
         self.textEdit_Actions.setObjectName(_fromUtf8("textEdit_Actions"))
+        self.label_2 = QtGui.QLabel(self.dockWidgetContents)
+        self.label_2.setGeometry(QtCore.QRect(720, 380, 191, 17))
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.label_sig = QtGui.QLabel(self.dockWidgetContents)
+        self.label_sig.setGeometry(QtCore.QRect(750, 410, 66, 17))
+        self.label_sig.setObjectName(_fromUtf8("label_sig"))
         DockWidget.setWidget(self.dockWidgetContents)
         self.actionSimular = QtGui.QAction(DockWidget)
         self.actionSimular.setObjectName(_fromUtf8("actionSimular"))
@@ -152,6 +158,8 @@ class Ui_DockWidget(object):
         item.setText(QtGui.QApplication.translate("DockWidget", "VALOR", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("DockWidget", "Registros", None, QtGui.QApplication.UnicodeUTF8))
         self.btnSimular.setText(QtGui.QApplication.translate("DockWidget", "Simular", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("DockWidget", "Siguiente Instruccion", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_sig.setText(QtGui.QApplication.translate("DockWidget", "TextLabel", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSimular.setText(QtGui.QApplication.translate("DockWidget", "Simular", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSimular.setToolTip(QtGui.QApplication.translate("DockWidget", "<html><head/><body><p>Simular</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
 
