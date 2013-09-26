@@ -59,6 +59,7 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox = QtGui.QTextEdit(self)
         self.textbox.setGeometry(0,35,395,630)
         self.textbox.setText(text)
+        self.textbox.setFont(QtGui.QFont ("Courier", 9))
         self.textbox.show()
     
     def create_file(self):
@@ -126,6 +127,7 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox_errors = QtGui.QTextEdit(self)
         self.textbox_errors.setGeometry(400,35,800,350)
         self.textbox_errors.setText(errors)
+        self.textbox_errors.setFont(QtGui.QFont ("Courier", 9))
         self.textbox_errors.show()
 
     def show_textBox_obj(self,text):
@@ -134,6 +136,7 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox_obj = QtGui.QTextEdit(self)
         self.textbox_obj.setGeometry(400,480,800,510)
         self.textbox_obj.setText(text)
+        self.textbox_obj.setFont(QtGui.QFont ("Courier", 14))
         self.textbox_obj.show()
 
 if __name__ == '__main__':

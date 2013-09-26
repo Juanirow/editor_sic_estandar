@@ -32,7 +32,7 @@ tokens = keyword + (
 # @param t instancia del token de leX
 # @return instancia del token que emparejo
 def t_CVALOR(t):
-	r'C\'[a-zA-Z][a-zA-Z_]*\''
+	r'C\'[a-zA-Z][a-zA-Z_ ]*\''
 	return t
 ## metodo que empareja las constantes para la directiva BYTE de tipo hexadecimal 
 # que tienen la forma X'VALOR'

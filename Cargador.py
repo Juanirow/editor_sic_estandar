@@ -3,7 +3,6 @@ from windowcargador import Ui_DockWidget
 from hexadecimal import Hexadecimal
 from convert import Convert
 from register import Register
-from step2 import Step2
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -581,7 +580,7 @@ class Cargador(QtGui.QDockWidget):
         self.get_next_text_instruction()
         it = 1
         while it < 5:
-            item = QtGui.QTableWidgetItem("007FFFH")
+            item = QtGui.QTableWidgetItem("FFFFFFH")
             self.window.tableWidget_2.setItem(it,0,item)
             it += 1
         
