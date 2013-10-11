@@ -113,13 +113,32 @@ class Ensamblador:
             code = list[ite]
             if not code == "":
                 string = list[ite]
-                string = parser.pc[ite] + "\t" + string+ self.str_space(string,30)
+                string = self.filter_code(string)
+                string = parser.pc[ite] + "\t" + string
                 if ite < len(parser.obj_code):
                     string += parser.obj_code[ite] + "\t" 
                 string += error +"\n"
                 file.write(string)
             ite += 1
-    
+            
+    def filter_code(self,str_code):
+        list_code = str_code.split("\t")
+        str_code = ""
+        for it in list_code:
+            str_code += it +" "
+        list_code = str_code.split(" ")
+        while "" in list_code:
+            list_code.remove("")
+        num = len(list_code)
+        it = 0 
+        str_code = ""
+        while it < 3:
+            if it < num:
+                str_code += list_code[it]
+            str_code += "\t"
+            it += 1
+        return str_code
+        
     ## imprime la tabla de simbolos
     # @param fo archivo donde se imprimiran los simbolos      
     def print_symbols(self,fo):
@@ -151,4 +170,4 @@ class Ensamblador:
             error = self.get_line_error(it)
             fo.write(error+"\n")
             it += 1 
-            
+
