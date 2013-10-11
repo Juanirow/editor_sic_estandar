@@ -11,6 +11,7 @@ from my_file import File
 from parser import parse
 from step2 import Step2
 import parser
+import scanner
 
 class Ensamblador:
     
@@ -24,15 +25,16 @@ class Ensamblador:
         fi = File()
         if fi.open(file_name):
             text = fi.read()
+            parser.extencion = fi.extension
             text_file=self.new_line_filter(text)
             list_text = text_file.split("\n")
+#            scanner.entrada(text_file)
             parse.parse(text_file)
             file_name = fi.name
             fo = File()
-            fo.create_file(file_name,"t")
-            if not parser.num_errors() == 0:            
-                self.print_error_step1(fo,list_text)
-            else:
+            fo.create_file(file_name,"t"+fi.extension)
+            if parser.num_errors() == 0: 
+                print "entro al paso 2"
                 parse.pasada=2
                 parser.scann.lineno = 1
                 parse.parse(text_file)
@@ -48,8 +50,20 @@ class Ensamblador:
                 self.print_symbols(fo)
                 if parser.num_errors()==0:
                     fo_obj = File()
-                    fo_obj.create_file(file_name,"os")
-                    self.print_obj_file(fo_obj)
+                    fo_obj.create_file(file_name,"o"+parser.extencion)
+                    self.print_obj_file(fo_obj)                   
+            else:
+                print "No se realizo el paso 2"
+                len_p = parser.get_len_program()
+                fi.close()
+                print "============"
+                print "Del archivo "+fo.name
+                print "Errores: "+str(parser.num_errors())
+                print "Warnings: " +str(len(parser.warnings))
+                fo.write("Tamaño del Programa:" + str(len_p)+"\n\n")
+                self.print_program(fo,list_text)
+                fo.write("\n\n")
+                self.print_symbols(fo)
             fo.close()
             
     ##inicializa los valores usados en analisis lexico y sintactico
@@ -101,7 +115,7 @@ class Ensamblador:
             cad += " "
             val += 1
         return cad
-        
+
     ##imprime en un archivo el codigo de entrada pero con contador de programa y errores 
     #@param file archivo de salida
     #@param lista de cadenas que forman el archivo
@@ -120,7 +134,7 @@ class Ensamblador:
                 string += error +"\n"
                 file.write(string)
             ite += 1
-            
+    
     def filter_code(self,str_code):
         list_code = str_code.split("\t")
         str_code = ""
@@ -138,7 +152,7 @@ class Ensamblador:
             str_code += "\t"
             it += 1
         return str_code
-        
+    
     ## imprime la tabla de simbolos
     # @param fo archivo donde se imprimiran los simbolos      
     def print_symbols(self,fo):
@@ -167,7 +181,10 @@ class Ensamblador:
         it = 0
         len_p = len(list)
         while it < len_p:
-            error = self.get_line_error(it)
-            fo.write(error+"\n")
-            it += 1 
+            code = list[it]
+            if not code == "":
+                error = parser.pc[it]+ "\t"+list[it]+" \t"+self.get_line_error(it+1)
+                fo.write(error+"\n")
+            it += 1
 
+            

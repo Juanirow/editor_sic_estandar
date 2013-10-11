@@ -33,16 +33,17 @@ class Hexadecimal:
         num1 = self.change_hexadecimal(num1)
         num2 = self.change_hexadecimal(num2)
         num1 = convert.to_decimal(num1)
-        num2 = convert.to_decimal(num2)
-        if not num1 == -1 and not num2 ==-1:            
-            res = num1-num2
-            if res == 0:
-                res = "0H"
-            else:
-                res = convert.decimal_to_hexadecimal(res)
-            return res
+        num2 = convert.to_decimal(num2)          
+        res = num1-num2
+        if res < 0:
+            res = int(res * -1)
+            res = res ^ 4095
+            res += 1
+        if res == 0:
+            res = "0H"
         else:
-            return "error"
+            res = convert.decimal_to_hexadecimal(res)
+        return res
 
     ## checa si una cadena representa un  numero  hexadecimal 
     # @param num cadena que se checa si el ultimo caracter es H 
@@ -73,6 +74,7 @@ class Hexadecimal:
         res = convert.decimal_to_hexadecimal(res)
         del convert
         return res
+        
     def or_op(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)

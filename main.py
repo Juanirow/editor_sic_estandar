@@ -41,8 +41,13 @@ class Window_Form(QtGui.QMainWindow):
             self.textbox.close()
             self.set_statusBar_Text("Cerrando archivo")
         self.close_text_errors()
+        self.close_textBox_obj()
         self.file = None
 
+    def close_textBox_obj(self):
+        if self.textbox_obj:
+            self.textbox_obj.close()
+            
     def close_text_errors(self):
         if self.textbox_errors:
             self.textbox_errors.close()
@@ -100,23 +105,24 @@ class Window_Form(QtGui.QMainWindow):
         self.set_statusBar_Text("Compilando")
         if self.is_file_open():
             fc = File()
-            if fc.is_extension_valid(self.file,'s'):
+            if fc.is_extension_valid(self.file,'s') or fc.is_extension_valid(self.file,'x') :
                 self.file_name = fc.get_file_name(self.file)
                 self.file_name = fc.name
                 self.set_statusBar_Text("Compilando") 
                 os.system("python principal.py "+str(self.file))
-                self.set_statusBar_Text("Cargando archivo intermedio "+self.file_name)              
-                file_error = open(self.file_name+".t")
+                self.set_statusBar_Text("Cargando archivo intermedio "+self.file_name)
+                file_error = open(self.file_name+".t"+fc.extension)
                 text_errors = file_error.read()
                 self.show_textBox_errors(text_errors)
-                self.set_statusBar_Text("Cargando archivo objeto "+self.file_name+".os")
-                if os.path.isfile(self.file_name+".os"):
-                    file_obj = open(self.file_name+".os")
+                name_file = self.file_name+".o"+fc.extension
+                self.set_statusBar_Text("Cargando archivo objeto "+name_file)
+                if os.path.isfile(name_file):
+                    file_obj = open(name_file)
                     obj_text = file_obj.read()
                     self.show_textBox_obj(obj_text)
-                self.set_statusBar_Text("Se termino el ensablado de "+self.file_name+".s")
+                self.set_statusBar_Text("Se termino el ensablado de "+name_file)
             else:
-                self.set_statusBar_Text("No se puede compilar el archivo no es un .s")
+                self.set_statusBar_Text("No se puede compilar el archivo no es un .s o .x")
         else: 
             self.set_statusBar_Text("No hay un archivo por compilar")
 

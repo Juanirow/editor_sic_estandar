@@ -13,6 +13,7 @@ class File:
     def __init__(self):
         self.name = ""
         self.file = ""
+        self.extension = ""
 
     ## metodo para abrir un archivo el cual checa si la 
     #extension es .s 
@@ -63,7 +64,7 @@ class File:
     # @return True si el archivo es de extension correcta 
     def get_file_name(self,string):
         list_names =  string.split('.')
-        if self.is_extension_valid(list_names,'s'):
+        if self.is_extension_valid(list_names,'s') or self.is_extension_valid(list_names,'x'):
             self.extension = list_names[-1]
             name_part = list_names[-2]
             list_names = name_part.split('/')
@@ -78,7 +79,8 @@ class File:
     def is_extension_valid(self,list,extension):
         ret = False
         if list.count >= 2:
-            if list[-1] == extension:
+            self.extension = list[-1]
+            if self.extension == extension:
                 ret = True
         return ret
     

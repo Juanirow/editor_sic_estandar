@@ -17,15 +17,42 @@ keyword = (
   	'JLT','JSUB', 'LDA',  'LDCH',  'LDL',
   	'LDX', 'MUL',  'OR',  'RD',  'TIX',
   	'STA', 'STCH',  'STL',  'STSW',  'STX',
-  	'SUB', 'TD',  'WD','RSUB','ADD'
-)
+  	'SUB', 'TD',  'WD','RSUB','ADD','ADDF','ADDR',
+      'CLEAR','COMPF','COMPR','DIVF','DIVR','FLOAT',
+      'BASE','HIO','LDB','LDF','LPS','LDS','LDT','MULF','MULR',
+      'NORM','RMO','SHIFTL','SHIFTR','SIO','SSK','STB','STF',
+      'STI','STT','STS','SUBF','SUBR','SVC','TIO','TIXR','FIX')
 
 ## declaracion de los tokens
 tokens = keyword + (
 			'ETIQUETA','DECIMAL',
-			'DIR','HEX','CVALOR','XVALOR'
+			'DIR','HEX','CVALOR','XVALOR','REGISTER','COMMA','PLUS','HASHTAG','AT'
 		)
 
+registers = ('A','X','L','CP','SW','B','S','T','F')
+
+
+
+##metodo que empareja con el caracter de suma
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_PLUS(t):
+    r'\+'
+    return t
+    
+##metodo que empareja con el caracter de "#"
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_HASHTAG(t):
+    r'\#'
+    return t
+
+##metodo que empareja con el caracter de "@"
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_AT(t):
+    r'@'
+    return t
 
 ## metodo que empareja las constantes para la directiva byte de tipo cadena
 # que tienen la forma C'VALOR'
@@ -55,6 +82,14 @@ def t_HEX(t):
 def t_DIR(t):
 	r'\,[\t ]*X'
 	return t
+##metodo que empareja con la coma
+# @param t instancia del token de leX
+# @return instancia del token que emparejo 
+def t_COMMA(t):
+    r'\,'
+    return t
+
+    
 ##metodo para emparejar numeros decimales 
 # @param t instancia del token de leX
 # @return instancia del token que emparejo
@@ -72,10 +107,13 @@ def t_newline(t):
 # @param t instancia del token de leX
 # @return instancia del token que emparejo o de la palabra reservada 
 def t_ETIQUETA(t):
-	r'[A-Z][A-Z_0-9]*'
-	if t.value in keyword:
-		t.type = t.value
-	return t
+    r'[A-Z][A-Z_0-9]*'
+    if t.value in keyword:
+        t.type = t.value
+    if t.value in registers:
+        t.type = "REGISTER"
+    return t
+    
 ## caracteres de espacio y tabulador ignorados
 t_ignore = ' \t'
 

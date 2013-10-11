@@ -45,13 +45,19 @@ class Register:
         string = self.filter_number(string)
         len_str = len(string)
         it = 0
-        while it < num_max:
-            if it < len_str:
-                new_byte += string[it]
-            else:
-                new_byte = "0"+new_byte
-            it += 1
-        return new_byte
+        if not num_max == len_str:
+            if num_max < len_str:
+                it = len_str - num_max
+                return string[it:]
+            while it < num_max:
+                if it < len_str:
+                    new_byte += string[it]
+                else:
+                    new_byte = "0"+new_byte
+                it += 1
+            return new_byte
+        return string
+    
     ## checa si un numero contiene la H al final y si es asi se la quita 
     # @param value cadena que representa un numero
     # @return regresa el valor hexadecimal si la H al final
@@ -127,6 +133,21 @@ class Register:
         hex = self.adjust_bytes(hex,2)
         register = "T" + dir +hex+self.register
         return register
+        
+    def make_M(self,obj_code,cp_num):
+        c = Convert()
+        cp_num = c.to_decimal(cp_num) + 1
+        cp_num = c.decimal_to_hexadecimal(cp_num)        
+        dir= self.filter_number(cp_num)
+        dir = self.adjust_bytes(dir,6)
+        edit_bytes = obj_code[3:]
+        len_bytes = len(edit_bytes)
+        len_bytes = self.adjust_bytes(str(len_bytes),2)
+        register = "M" + str(dir) + str(len_bytes)
+        return register
+        
+        
+        
             
     
     

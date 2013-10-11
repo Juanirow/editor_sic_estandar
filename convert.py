@@ -114,7 +114,8 @@ class Convert:
     # @param max_num numero de bits en la que se representara el numero
     # @return cadena de 1 y 0 que representa el valor de tamaño max_num    
     def decimal_to_binary(self,value,max_num):
-        value = format(value, '#0'+str(max_num+2)+'b')[2:]
+        string = '#0'+str(max_num+2)+'b'
+        value = format(value,string)[2:]
         return value
     
     ## desplazamineto a la izquierda en n bits
@@ -180,8 +181,17 @@ class Convert:
           ns = self.dec_caracters.get(int(ns),ns)
           s = ns + s
       return s+"H"
+  
+    def list_to_string(self,dicc):
+          string = ""
+          for l in dicc:
+              string += str(dicc[l])
+          return string
           
-#c = Convert()
+#dic = {'n':1,'i':2}
+#print c.list_to_string(dic)
+
+#print c.decimal_to_hexadecimal("0")
 #print c.shift_binary_left("000000110011",2)
 #print c.shift_binary_right("000000110011",2)
 #print c.mask_and("0000000000","0000011111")
