@@ -32,15 +32,14 @@ class Ensamblador:
             parse.parse(text_file)
             file_name = fi.name
             fo = File()
+            print "============"
             fo.create_file(file_name,"t"+fi.extension)
             if parser.num_errors() == 0: 
-                print "entro al paso 2"
                 parse.pasada=2
                 parser.scann.lineno = 1
                 parse.parse(text_file)
                 len_p = parser.get_len_program()
                 fi.close()
-                print "============"
                 print "Del archivo "+fo.name
                 print "Errores: "+str(parser.num_errors())
                 print "Warnings: " +str(len(parser.warnings))
@@ -56,7 +55,6 @@ class Ensamblador:
                 print "No se realizo el paso 2"
                 len_p = parser.get_len_program()
                 fi.close()
-                print "============"
                 print "Del archivo "+fo.name
                 print "Errores: "+str(parser.num_errors())
                 print "Warnings: " +str(len(parser.warnings))
@@ -64,6 +62,7 @@ class Ensamblador:
                 self.print_program(fo,list_text)
                 fo.write("\n\n")
                 self.print_symbols(fo)
+            print parser.errors
             fo.close()
             
     ##inicializa los valores usados en analisis lexico y sintactico
@@ -74,7 +73,7 @@ class Ensamblador:
         parser.dir_init = ""
         parser.pc = []
         parser.obj_code=[]
-        parser.symbols = {}
+        parser.symbols = []
         parse.pasada=1
         parse.inicial = "0H"
         parser.warnings = {}
@@ -119,6 +118,21 @@ class Ensamblador:
     ##imprime en un archivo el codigo de entrada pero con contador de programa y errores 
     #@param file archivo de salida
     #@param lista de cadenas que forman el archivo
+#    def print_program(self,file,list):
+#        file.write("Archivo intermedio\n")
+#        ite = 0
+#        while ite < len(list):
+#            error = self.get_line_error(ite+1)
+#            code = list[ite]
+#            if not code == "":
+#                string = list[ite]
+#                string = parser.pc[ite] + "\t" + string+ self.str_space(string,30)
+#                if ite < len(parser.obj_code):
+#                    string += parser.obj_code[ite] + "\t" 
+#                string += error +"\n"
+#                file.write(string)
+#            ite += 1
+
     def print_program(self,file,list):
         file.write("Archivo intermedio\n")
         ite = 0
@@ -134,7 +148,7 @@ class Ensamblador:
                 string += error +"\n"
                 file.write(string)
             ite += 1
-    
+            
     def filter_code(self,str_code):
         list_code = str_code.split("\t")
         str_code = ""
@@ -158,8 +172,10 @@ class Ensamblador:
     def print_symbols(self,fo):
         fo.write("Tabla de Simbolos \n\n")
         for s in parser.symbols:
-            str = s + self.str_space(s,10) + parser.symbols[s]+"\n"
-            fo.write(str)
+            string = s.get_name()+"\t"
+            string += str(s.get_dir_val())+"\t"
+            string += s.get_sym_type()+"\n"            
+            fo.write(string)
     
     ## elimina los saltos de linea consecutivos 
     # @param str cadena a la que se le eliminaran los saltos de linea          

@@ -71,7 +71,7 @@ class Cargador(QtGui.QDockWidget):
         string += "(m..m+2)="+str(m)+"\n"
         a = self.hex.plus(a,m)
         string += "A <- A + (m...m+2)"+"\n"
-        a = self.reg.adjust_bytes(a,6)
+        a = self.reg.adjust_bytes(a,6,False)
         string += "A = "+str(a)+"\n"
         self.set_a_value(a)
         self.increment_cp(3)
@@ -86,7 +86,7 @@ class Cargador(QtGui.QDockWidget):
         string += "(m..m+2)="+str(m)+"\n"
         a = self.hex.and_op(a,m)
         string += "A <- A & (m...m+2)"+"\n"
-        a = self.reg.adjust_bytes(a,6)
+        a = self.reg.adjust_bytes(a,6,False)
         string += "A = "+str(a)+"\n"
         self.set_a_value(a)
         self.increment_cp(3)
@@ -113,7 +113,7 @@ class Cargador(QtGui.QDockWidget):
         string += "(m..m+2)="+str(m)+"\n"
         a = self.hex.div(a,m)
         string += "A <- A / (m...m+2)"+"\n"
-        a = self.reg.adjust_bytes(a,6)
+        a = self.reg.adjust_bytes(a,6,False)
         string += "A = "+str(a)+"\n"
         self.set_a_value(a)
         self.increment_cp(3)
@@ -124,7 +124,7 @@ class Cargador(QtGui.QDockWidget):
         m = self.get_mem_value(m)
         string += "(m..m+2) = "+str(m)+"\n"
         string += "A <- (m..m+2)"
-        a = self.reg.adjust_bytes(m,6)
+        a = self.reg.adjust_bytes(m,6,False)
         self.set_a_value(a)
         self.increment_cp(3)
         self.window.textEdit_Actions.setText(string)
@@ -132,7 +132,7 @@ class Cargador(QtGui.QDockWidget):
     def j_op(self,m):
         string = "J:\nCP<-m\n"
         string += "m = "+str(m)
-        m = self.reg.adjust_bytes(m,6)
+        m = self.reg.adjust_bytes(m,6,False)
         m = self.hex.change_hexadecimal(m)
         self.set_cp_value(m)
         self.window.textEdit_Actions.setText(string)
@@ -141,7 +141,7 @@ class Cargador(QtGui.QDockWidget):
         string = "JEQ \nCP<-m si CC == '='\n"
         string += "m = "+str(m)+"\n"
         string += "cc = "+str(self.cc)
-        m = self.reg.adjust_bytes(m,6)
+        m = self.reg.adjust_bytes(m,6,False)
         m = self.hex.change_hexadecimal(m)
         if self.cc == "=":
             self.set_cp_value(m)
@@ -153,7 +153,7 @@ class Cargador(QtGui.QDockWidget):
         string = "JGT \nCP<-m si CC == '>'\n"
         string += "m = "+str(m)+"\n"
         string += "cc = "+str(self.cc)
-        m = self.reg.adjust_bytes(m,6)
+        m = self.reg.adjust_bytes(m,6,False)
         m = self.hex.change_hexadecimal(m)
         if self.cc == ">":
             self.set_cp_value(m)
@@ -165,7 +165,7 @@ class Cargador(QtGui.QDockWidget):
         string = "JLT \nCP<-m si CC == '<'\n"
         string += "m = "+str(m)+"\n"
         string += "cc = "+str(self.cc)
-        m = self.reg.adjust_bytes(m,6)
+        m = self.reg.adjust_bytes(m,6,False)
         m = self.hex.change_hexadecimal(m)
         if self.cc == "<":
             self.set_cp_value(m)
@@ -226,7 +226,7 @@ class Cargador(QtGui.QDockWidget):
         string += "(m..m+2)="+str(m)+"\n"
         a = self.hex.mul(a,m)
         string += "A <- A * (m...m+2)"+"\n"
-        a = self.reg.adjust_bytes(a,6)
+        a = self.reg.adjust_bytes(a,6,False)
         string += "A = "+str(a)+"\n"
         self.set_a_value(a)
         self.increment_cp(3)
@@ -241,7 +241,7 @@ class Cargador(QtGui.QDockWidget):
         string += "(m..m+2)="+str(m)+"\n"
         a = self.hex.or_op(a,m)
         string += "A <- A | (m...m+2)"+"\n"
-        a = self.reg.adjust_bytes(a,6)
+        a = self.reg.adjust_bytes(a,6,False)
         string += "A = "+str(a)+"\n"
         self.set_a_value(a)
         self.increment_cp(3)
@@ -364,7 +364,7 @@ class Cargador(QtGui.QDockWidget):
         string += "(m..m+2)="+str(m)+"\n"
         a = self.hex.subs(a,m)
         string += "A <- A - (m...m+2)"+"\n"
-        a = self.reg.adjust_bytes(a,6)
+        a = self.reg.adjust_bytes(a,6,False)
         string += "A = "+str(a)+"\n"
         self.set_a_value(a)
         self.increment_cp(3)
@@ -408,7 +408,7 @@ class Cargador(QtGui.QDockWidget):
         return val
 
     def set_a_value(self,value):
-        value = self.reg.adjust_bytes(value,6)
+        value = self.reg.adjust_bytes(value,6,False)
         value = self.hex.change_hexadecimal(value)
         item_text = QtGui.QTableWidgetItem(value)
         self.window.tableWidget_2.setItem(1,0,item_text)  
@@ -422,7 +422,7 @@ class Cargador(QtGui.QDockWidget):
         return str(item.text())
         
     def set_l_value(self,value):
-        value = self.reg.adjust_bytes(value,6)
+        value = self.reg.adjust_bytes(value,6,False)
         value = self.hex.change_hexadecimal(value)
         item_text = QtGui.QTableWidgetItem(value)
         self.window.tableWidget_2.setItem(3,0,item_text)
@@ -432,7 +432,7 @@ class Cargador(QtGui.QDockWidget):
         return str(item.text())
     
     def set_x_value(self,value):
-        value = self.reg.adjust_bytes(value,6)
+        value = self.reg.adjust_bytes(value,6,False)
         value = self.hex.change_hexadecimal(value)
         item_text = QtGui.QTableWidgetItem(value)
         self.window.tableWidget_2.setItem(2,0,item_text)
@@ -442,7 +442,7 @@ class Cargador(QtGui.QDockWidget):
         return str(item.text())
     
     def set_sw_value(self,value):
-        value = self.reg.adjust_bytes(value,6)
+        value = self.reg.adjust_bytes(value,6,False)
         value = self.hex.change_hexadecimal(value)
         item_text = QtGui.QTableWidgetItem(value)
         self.window.tableWidget_2.setItem(4,0,item_text)   
@@ -452,7 +452,7 @@ class Cargador(QtGui.QDockWidget):
         return str(item.text())
     
     def set_cp_value(self,cp):
-        cp = self.reg.adjust_bytes(cp,6)
+        cp = self.reg.adjust_bytes(cp,6,False)
         cp = self.hex.change_hexadecimal(cp)
         item_text = QtGui.QTableWidgetItem(cp)
         self.window.tableWidget_2.setItem(0,0,item_text)
@@ -469,7 +469,7 @@ class Cargador(QtGui.QDockWidget):
     def get_row_index(self,value):
         index = str(value[0:-1])+"0"
         it = 0
-        index = self.reg.adjust_bytes(index,6)
+        index = self.reg.adjust_bytes(index,6,False)
         num_rows = self.window.tableWidget.rowCount()
         while it < num_rows:
             val = self.window.tableWidget.item(it,0)
@@ -565,7 +565,7 @@ class Cargador(QtGui.QDockWidget):
         while it <= num_rows:
             dir = index+"0H"
             r = Register("T")
-            dir = r.adjust_bytes(dir,6)
+            dir = r.adjust_bytes(dir,6,False)
             item = QtGui.QTableWidgetItem(dir)
             self.window.tableWidget.setItem(it,0,item)
             it += 1
@@ -573,7 +573,7 @@ class Cargador(QtGui.QDockWidget):
     
     def charge_end_file(self):
         dir = self.end[1:]
-        dir = self.reg.adjust_bytes(dir,6)
+        dir = self.reg.adjust_bytes(dir,6,False)
         dir = self.hex.change_hexadecimal(dir)
         item = QtGui.QTableWidgetItem(dir)
         self.window.tableWidget_2.setItem(0,0,item)

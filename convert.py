@@ -65,6 +65,7 @@ class Convert:
         else:
             ret = int(value)
         return ret
+        
     ## Convierte una cadena str a decimal
     # @param value: cadena a convertir a decimal puede ser en formato hexadecimal
     # @return regresa el valor decimal de la cadena 
@@ -171,7 +172,7 @@ class Convert:
           s="0"
       else:
           vi = int(value)
-          s = ""
+          s = "" 
       while vi > 0:
           vf = float(vi)
           vi = vi / 16
@@ -188,25 +189,16 @@ class Convert:
               string += str(dicc[l])
           return string
           
-#dic = {'n':1,'i':2}
-#print c.list_to_string(dic)
+    def exp_to_hexadecimal(self,val):
+        if val < 0:
+            val = int(val * -1)
+            val = val ^ 65535
+            val += 1
+        if val == 0:
+            val = "0H"
+        else:
+            val = self.decimal_to_hexadecimal(val)
+        return val
+        
 
-#print c.decimal_to_hexadecimal("0")
-#print c.shift_binary_left("000000110011",2)
-#print c.shift_binary_right("000000110011",2)
-#print c.mask_and("0000000000","0000011111")
-#val = c.decimal_to_binary(14,24)
-#print val
-#val = int(val,2)
-#
-#val = val << 16
-#print val
-#val = c.decimal_to_binary(val,24)
-#val = int(val,2)
-#print val
-
-
-#val = bin(12)
-#print val
-#val << 1
-#print val
+               

@@ -22,6 +22,7 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox_errors = None
         self.textbox_obj = None
         self.cargador = None
+        self.fc = None
         QtCore.QObject.connect(self.window.actionAbrir, QtCore.SIGNAL("triggered()"), self.open_file)
         QtCore.QObject.connect(self.window.actionNuevo, QtCore.SIGNAL("triggered()"), self.create_file)
         QtCore.QObject.connect(self.window.actionGuardar, QtCore.SIGNAL("triggered()"), self.save_file)
@@ -32,9 +33,12 @@ class Window_Form(QtGui.QMainWindow):
 
     def cargar(self):
         if self.is_file_open():
-            self.cargador = Cargador()
-            self.cargador.show()
-            self.cargador.load_file_name(self.file_name)
+            if self.fc.extension == 's':
+                self.cargador = Cargador()
+                self.cargador.show()
+                self.cargador.load_file_name(self.file_name)
+            else:
+                self.set_statusBar_Text("El archivo no es uno de la version estandar")
 
     def close_file(self):
         if self.textbox:
@@ -104,17 +108,17 @@ class Window_Form(QtGui.QMainWindow):
         self.save_file()
         self.set_statusBar_Text("Compilando")
         if self.is_file_open():
-            fc = File()
-            if fc.is_extension_valid(self.file,'s') or fc.is_extension_valid(self.file,'x') :
-                self.file_name = fc.get_file_name(self.file)
-                self.file_name = fc.name
+            self.fc = File()
+            if self.fc.is_extension_valid(self.file,'s') or self.fc.is_extension_valid(self.file,'x') :
+                self.file_name = self.fc.get_file_name(self.file)
+                self.file_name = self.fc.name
                 self.set_statusBar_Text("Compilando") 
                 os.system("python principal.py "+str(self.file))
                 self.set_statusBar_Text("Cargando archivo intermedio "+self.file_name)
-                file_error = open(self.file_name+".t"+fc.extension)
+                file_error = open(self.file_name+".t"+self.fc.extension)
                 text_errors = file_error.read()
                 self.show_textBox_errors(text_errors)
-                name_file = self.file_name+".o"+fc.extension
+                name_file = self.file_name+".o"+self.fc.extension
                 self.set_statusBar_Text("Cargando archivo objeto "+name_file)
                 if os.path.isfile(name_file):
                     file_obj = open(name_file)

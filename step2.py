@@ -32,6 +32,8 @@ class Step2:
         self.registers = {"A":"0","X":"1","L":"2","CP":"8","SW":"9","B":"3","S":"4","T":"5","F":"6"}
         self.base = "1038H"
         self.m_register = []
+        self.m_modif_register = []
+        self.h_name = ""
     
     ## inserta una cadena de bytes en el registro T actual si no cabe genera 
     #otro registro nuevo para almacenar los datos
@@ -65,6 +67,7 @@ class Step2:
         r = Register("H")
         register_h = r.make_H(name,length,inicial)
         self.list_registers.append(register_h)
+        self.h_name = r.adjust_name(name)
         del r
         
 #==============================================================================
@@ -80,10 +83,17 @@ class Step2:
     
     def make_register_m(self,obj_list,cp_list):
         r = Register("M")
+        r.name = self.h_name
         it = 0 
         while it < len(self.m_register):
             index = self.m_register[it]
             register = r.make_M(obj_list[index-1],cp_list[index-1])
+            self.list_registers.append(register)
+            it += 1
+        it = 0
+        while it < len(self.m_modif_register):
+            index = self.m_modif_register[it]
+            register = r.make_M_modificado(obj_list[index-1],cp_list[index-1])
             self.list_registers.append(register)
             it += 1
     
@@ -94,7 +104,7 @@ class Step2:
             value = int(float(value))
             value = c.decimal_to_hexadecimal(value)
         r = Register("T")
-        value = r.adjust_bytes(value,6)
+        value = r.adjust_bytes(value,6,True)
         value = r.filter_number(value)
         del r
         return value
@@ -165,7 +175,7 @@ class Step2:
         val = int(binary,2)
         val = c.decimal_to_hexadecimal(val)
         val = r.filter_number(val)  
-        val = r.adjust_bytes(val,6)
+        val = r.adjust_bytes(val,6,False)
         del r
         del c
         return val
@@ -258,10 +268,15 @@ class Step2:
     def is_relative_cp(self,cp,arg):
         hex = Hexadecimal()
         c = Convert()        
-        res = hex.subs(arg,cp)
-        res = c.to_decimal(res)
+        res_hex = hex.subs_minus(arg,cp)
+        sign = res_hex[1]
+        res_hex = res_hex[0]
+        res = int(c.to_decimal(res_hex))
+        if sign == "-":
+            res = (res ^ 4095)+1
+            res = res * -1 
         if res <= 2047 and res >= -2048:
-            return c.decimal_to_hexadecimal(res)
+            return c.exp_to_hexadecimal(res)
         else: 
             return None
         
@@ -272,8 +287,6 @@ class Step2:
         res_dec = c.to_decimal(res)
         if res_dec >= 0 and res_dec <= 4095:
             return res
-        del c
-        del hex
         return None
     
     def operation_type_3_4(self,cp,operator,arg,format_type,num_line,dir_type,type_c,is_index,valid_label):
@@ -286,9 +299,9 @@ class Step2:
         if format_type == 4:
             flags['e']=1
             num_max=5
-            if not type_c:
+            if not type_c and valid_label == "relativo":
                 self.m_register.append(num_line)
-            res = self.current_register.adjust_bytes(arg,num_max)
+            res = self.current_register.adjust_bytes(arg,num_max,True)
         else:
             if type_c:
                 if not self.is_type_c(arg):
@@ -297,7 +310,7 @@ class Step2:
                     entra = False
                     if not c.is_hexadecimal(arg):
                         arg = c.decimal_to_hexadecimal(arg)
-                    res = self.current_register.adjust_bytes(arg,3)
+                    res = self.current_register.adjust_bytes(arg,3,True)
             if entra:
                 res = self.is_relative_cp(cp,arg)
                 if not res:
@@ -309,7 +322,7 @@ class Step2:
                         valid_label = False
                 else:
                     flags['p'] = 1
-                res = self.current_register.adjust_bytes(res,num_max)
+                res = self.current_register.adjust_bytes(res,num_max,True)
         if is_index:
             flags['x'] = 1
         if not valid_label:
@@ -319,7 +332,9 @@ class Step2:
         val = operator + flags
         val = str(int(val,2))
         val = c.decimal_to_hexadecimal(val)
-        val = self.current_register.adjust_bytes(val,3)
+        if len(val)==3:
+            val = "0"+val
+        val = self.current_register.adjust_bytes(val,3,True)
         val += str(res)
         del c
         return val

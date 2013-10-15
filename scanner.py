@@ -21,18 +21,61 @@ keyword = (
       'CLEAR','COMPF','COMPR','DIVF','DIVR','FLOAT',
       'BASE','HIO','LDB','LDF','LPS','LDS','LDT','MULF','MULR',
       'NORM','RMO','SHIFTL','SHIFTR','SIO','SSK','STB','STF',
-      'STI','STT','STS','SUBF','SUBR','SVC','TIO','TIXR','FIX')
+      'STI','STT','STS','SUBF','SUBR','SVC','TIO','TIXR','FIX','EQU','ORG')
 
 ## declaracion de los tokens
 tokens = keyword + (
 			'ETIQUETA','DECIMAL',
-			'DIR','HEX','CVALOR','XVALOR','REGISTER','COMMA','PLUS','HASHTAG','AT'
+			'DIR','HEX','CVALOR','XVALOR','REGISTER','COMMA','PLUS','HASHTAG','AT',
+               'MINUS','DIVI','MULTI','PARENO','PARENC','_SALTO',
 		)
 
 registers = ('A','X','L','CP','SW','B','S','T','F')
 
 
-
+##metodo que empareja con el caracter de asignacion
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_EQUAL(t):
+    r'\='
+    return t
+    
+##metodo que empareja con el caracter de parentesis abierto
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_PARENC(t):
+    r'\)'
+    return t
+    
+    
+##metodo que empareja con el caracter de parentesis abierto
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_PARENO(t):
+    r'\('
+    return t
+    
+##metodo que empareja con el caracter de multiplicacion
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_MULTI(t):
+    r'\*'
+    return t
+    
+##metodo que empareja con el caracter de divicion
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_DIVI(t):
+    r'\/'
+    return t
+    
+##metodo que empareja con el caracter de resta
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+def t_MINUS(t):
+    r'\-'
+    return t
+    
 ##metodo que empareja con el caracter de suma
 # @param t instancia del token de leX
 # @return instancia del token que emparejo
@@ -99,9 +142,10 @@ def t_DECIMAL(t):
 
 ##metodo para aumentar la linea de codigo cuando se encuentra un salto de linea
 # @param t instancia del token de leX
-def t_newline(t):
+def t__SALTO(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
+    return t
     
 ##metodo que analiza las etiquetas y checa si no son palabras reservadas
 # @param t instancia del token de leX

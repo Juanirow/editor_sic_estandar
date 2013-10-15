@@ -44,6 +44,26 @@ class Hexadecimal:
         else:
             res = convert.decimal_to_hexadecimal(res)
         return res
+        
+    def subs_minus(self,num1,num2):
+        convert = Convert()
+        num1 = self.change_hexadecimal(num1)
+        num2 = self.change_hexadecimal(num2)
+        num1 = convert.to_decimal(num1)
+        num2 = convert.to_decimal(num2)          
+        res = num1-num2
+        sign = "+"
+        if res < 0:
+            sign = "-"
+            res = int(res * -1)
+            res = res ^ 4095
+            res += 1
+        if res == 0:
+            res = "0H"
+        else:
+            res = convert.decimal_to_hexadecimal(res)
+        return [res,sign]
+
 
     ## checa si una cadena representa un  numero  hexadecimal 
     # @param num cadena que se checa si el ultimo caracter es H 

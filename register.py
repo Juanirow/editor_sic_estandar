@@ -14,6 +14,7 @@ class Register:
         self.type=type
         self.register = ""
         self.init_dir = ""
+        self.name = ""
     ## obtiene el tamaño del registro
     # @return regresa el tamaño en decimal
     def get_len(self):
@@ -40,11 +41,14 @@ class Register:
     # @param string cadena de bytes que se ajustaran a un tamaño
     # @param num_max tamaño al que se ajustara la cadena de bytes 
     # @return regresa una nueva cadena de bytes de tamalo num_max
-    def adjust_bytes(self,string,num_max):
+    def adjust_bytes(self,string,num_max,check_f):
         new_byte = ""
         string = self.filter_number(string)
         len_str = len(string)
         it = 0
+        letter_fill = "0"
+        if string[0] == "F" and check_f:
+            letter_fill = "F"
         if not num_max == len_str:
             if num_max < len_str:
                 it = len_str - num_max
@@ -53,7 +57,7 @@ class Register:
                 if it < len_str:
                     new_byte += string[it]
                 else:
-                    new_byte = "0"+new_byte
+                    new_byte = letter_fill+new_byte
                 it += 1
             return new_byte
         return string
@@ -83,8 +87,9 @@ class Register:
        length = self.filter_number(length)
        inicial = self.filter_number(inicial)
        name = self.adjust_name(name)
-       inicial = self.adjust_bytes(inicial,6)
-       length = self.adjust_bytes(length,6)
+       self.name = name
+       inicial = self.adjust_bytes(inicial,6,False)
+       length = self.adjust_bytes(length,6,False)
        self.register = "H"+name+inicial+length
        return self.register
        
@@ -112,10 +117,10 @@ class Register:
     # @return cadena con el registro final de 7 bytes
     def make_E(self,label,dir_ini):
         if label == "":
-            dir = self.adjust_bytes(dir_ini,6)
+            dir = self.adjust_bytes(dir_ini,6,False)
         else:
             dir = self.filter_number(label)
-        return "E"+self.adjust_bytes(dir,6)
+        return "E"+self.adjust_bytes(dir,6,False)
         
 #==============================================================================
 #         ========== Registro T ==========
@@ -126,11 +131,11 @@ class Register:
     def make_T(self):
         c = Convert()
         dir = self.filter_number(self.init_dir)
-        dir = self.adjust_bytes(dir,6)
+        dir = self.adjust_bytes(dir,6,False)
         len_register = len(self.register)/2
         len_hex = c.decimal_to_hexadecimal(len_register)
         hex = self.filter_number(len_hex)
-        hex = self.adjust_bytes(hex,2)
+        hex = self.adjust_bytes(hex,2,False)
         register = "T" + dir +hex+self.register
         return register
         
@@ -139,11 +144,23 @@ class Register:
         cp_num = c.to_decimal(cp_num) + 1
         cp_num = c.decimal_to_hexadecimal(cp_num)        
         dir= self.filter_number(cp_num)
-        dir = self.adjust_bytes(dir,6)
+        dir = self.adjust_bytes(dir,6,False)
         edit_bytes = obj_code[3:]
         len_bytes = len(edit_bytes)
-        len_bytes = self.adjust_bytes(str(len_bytes),2)
-        register = "M" + str(dir) + str(len_bytes)
+        len_bytes = self.adjust_bytes(str(len_bytes),2,False)
+        register = "M" + str(dir) + str(len_bytes)+"+"+self.name
+        return register
+        
+    def make_M_modificado(self,obj_code,cp_num):
+        c = Convert()
+        cp_num = c.to_decimal(cp_num)
+        cp_num = c.decimal_to_hexadecimal(cp_num)        
+        dir= self.filter_number(cp_num)
+        dir = self.adjust_bytes(dir,6,False)
+        edit_bytes = obj_code
+        len_bytes = len(edit_bytes)
+        len_bytes = self.adjust_bytes(str(len_bytes),2,False)
+        register = "M" + str(dir) + str(len_bytes)+"+"+self.name
         return register
         
         

@@ -15,19 +15,19 @@ from displacement import Displacement
 from hexadecimal import Hexadecimal
 from step2 import Step2
 from register import Register
+from symbol import Symbol
 
 hex = Hexadecimal()
 conv = Convert()
 disp = Displacement()
 step2 = Step2()
 reg = Register("R")
-
 errors = {}
 warnings = {}
 dir_init = ""
 pc = []
 obj_code=[]
-symbols = {}
+symbols = []
 
 extencion =""
 base = 0
@@ -45,13 +45,22 @@ def get_registers():
     return step2.list_registers
 
 ##inserta una etiqueta a la tabla de simbolos y si esta ya se encuentra marca un error
-#@param value simbolo que se intentara insertar a la tabla
+#@param name simbolo que se intentara insertar a la tabla
+#@param dir_val direccion o valor del simbolo
+#@param sym_type tipo del simbolo el cual puede ser relativo o absoluto
 #@param lineno numero de linea donde se encontro la etiqueta
-def insert_symbol(value,lineno):
-    if value in symbols:
+def insert_symbol(name,dir_val,sym_type,lineno):
+    if exist_symbol(name):
         insert_error(lineno,"etiqueta previamente definida")
     else:
-        symbols[value] = pc[-1]
+        sym = Symbol(name,dir_val,sym_type)
+        symbols.append(sym)
+        
+def exist_symbol(name):
+    for it in symbols:
+        if it.get_name() == name:
+            return it
+    return None
         
 ## calcula el tamaÃ±o del programa 
 #@return regresa en hexadecimal el tamaÃ±o del programa
@@ -107,8 +116,21 @@ def increment_PC(increment):
     if not conv.is_hexadecimal(str(increment)):
         increment = conv.decimal_to_hexadecimal(increment)
     val = hex.plus(num1,increment)
-    val = reg.adjust_bytes(val,6)
+    if val == "H":
+        val = "0H"
+    val = reg.adjust_bytes(val,6,False)
     pc.append(val+"H")
+    
+def equal_type(type1,type2,sym_type):
+    if type1 == sym_type:
+        if type2 == sym_type:
+            return True
+    return False
+    
+def check_error(type1,type2):
+    return type1 == "error" or type2 == "error"
+            
+        
 
 #==============================================================================
 #                       Reglas Gramaticales
@@ -119,7 +141,8 @@ def increment_PC(increment):
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_inicial(p):
   '''
-    INI : DS C DE
+    INI : DS _SALTO C DE _SALTO
+        | DS _SALTO C DE 
   '''
   pass 
 
@@ -144,6 +167,8 @@ def p_directiva_start(p):
         pc.append(parse.inicial)
     else:
         length = get_len_program()
+        if length == "H":
+            length = "0H"
         step2.directive_start(p[1],length,p[3])
         obj_code.append("")   
 
@@ -172,21 +197,57 @@ def p_directiva_end(p):
       step2.make_register_m(obj_code,pc)
       if len(p) == 3:
           dir = p[2]
-          dir = symbols[dir]
+          sym = exist_symbol(dir)
+          if sym:
+              dir = sym.get_dir_val()
+          else:
+              insert_error(str(p.lineno(1)),"No se reconoce la etiqueta "+dir)
+              dir = "000000H"
       step2.directive_end(dir,pc[0])
       obj_code.append("")
   pass 
-
+ 
 ## conjunto de instrucciones las cuales pueden ser directivas o codigos de operacion
 # @brief se usa para encadenar instrucciones
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_codigo(p):
   '''
-  C : DC C 
-  | CP C
+  C : DC _SALTO C 
+  | CP _SALTO C
   | EPSILON
   '''
   pass 
+
+
+def p_org(p):
+    'DC : ORG CONSTANT'
+    if parse.pasada == 2:
+        obj_code.append("")
+    else:
+        increment_PC(0)
+    pass
+def p_directiva_equ_multi(p):
+    'DC : ETIQUETA EQU MULTI'
+    if parse.pasada == 1:
+        insert_symbol(p[1],pc[-1],"relativo",p.lineno(1))
+        increment_PC(0)
+    else:
+        obj_code.append("")
+    pass
+
+def p_directiva_equ_exp(p):
+    'DC : ETIQUETA EQU _EXP'
+    if parse.pasada == 1:
+        exp = p[3]
+        type_exp = check_is_valid_exp(p.lineno(1),exp[1])
+#        val = exp[0]
+#        conv.exp_to_hexadecimal(val)
+        val = conv.exp_to_hexadecimal(exp[0])
+        insert_symbol(p[1],val,type_exp,p.lineno(1))
+        increment_PC(0)
+    else:
+        obj_code.append("")
+    pass
 
 ## regla de epsilon que produce a vacio
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
@@ -221,7 +282,7 @@ def p_directiva_byte(p):
       num = p[2]
   if parse.pasada == 1:
       if not symb == "":
-          insert_symbol(p[1],p.lineno(1))
+          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
       increment_PC(num)
   else:
       str = step2.const_BYTE(num)
@@ -262,7 +323,7 @@ def p_directivas(p):
   '''
   if parse.pasada == 1:
       if len(p) == 3:
-          insert_symbol(p[1],p.lineno(1))
+          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
           inc = p[2]
       else:
           inc = p[1]
@@ -276,7 +337,7 @@ def p_directiva_base(p):
   '''
   if parse.pasada == 1:
       if len(p) == 3:
-          insert_symbol(p[1],p.lineno(1))
+          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
       increment_PC(0)
   pass
 
@@ -284,12 +345,14 @@ def p_directiva_base_valor(p):
     '''DIR_BASE : BASE ETIQUETA'''
     if parse.pasada == 2:
         label = p[2]
-        if not label in symbols:
-            symbols[label] = "7FFFH"
-            insert_warning(str(p.lineno(2)),"No existe la etiqueta "+label)
-        m = symbols[p[2]]
+        sym = exist_symbol(label)
+        if sym:
+            dir = sym.get_dir_val()
+        else:
+          insert_error(str(p.lineno(1)),"No se reconoce la etiqueta "+label)
+          dir = "0FFFFFH"
         obj_code.append("")
-        step2.base = m
+        step2.base = dir
     pass
 
 def p_directiva_base_valor_etiqueta(p):
@@ -311,7 +374,6 @@ def p_nemonico_directivas_hex(p):
   '''
   val = conv.to_decimal(p[2])
   if parse.pasada == 1:
-      inc = 3
       if p[1] == "RESW":
           inc = val * 3
       elif p[1] == "RESB":
@@ -327,6 +389,20 @@ def p_nemonico_directivas_hex(p):
           obj_code.append("")
   pass
 
+def p_directiva_word(p):
+    'NEMDIRECTIVA : WORD _EXP'
+    if parse.pasada == 2:
+        exp = p[2]
+        res = check_is_valid_exp(p.lineno(1),exp[1])
+        if res == "relativo":
+            step2.m_modif_register.append(p.lineno(1))
+        val = int(p[2][0])
+        val = conv.exp_to_hexadecimal(val)
+        val = step2.directive_word(str(val))
+        obj_code.append(val)
+        step2.insert_str(val,pc[p.lineno(1)-1])
+    p[0] = 3
+
 ## regresa un error si el valor para reservar esta mal declarado
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_nemonico_directivas_error(p):
@@ -339,8 +415,7 @@ def p_nemonico_directivas_error(p):
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_nemonico(p):
   '''
-  NEMONICO : WORD
-  | RESB
+  NEMONICO : RESB
   | RESW
   '''
   p[0] = p[1]
@@ -354,7 +429,7 @@ def p_codigo_operacion(p):
   | CI'''
   if parse.pasada == 1:
       if len(p)==3:
-          insert_symbol(p[1],p.lineno(1))
+          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
           val = p[2]
       else:
           val = p[1]
@@ -555,15 +630,6 @@ def p_instruccion_codigo_RSUB(p):
         p[0]=3
     pass
 
-## instrucciones que generan 3 p 4 bytes 
-# empareja las de direccionamiento simple
-# @param o arreglo mapeado con los simbolos gramaticales de la regla  
-def p_simple(p):
-    '''SIMPLE : SIMPLEC
-              | SIMPLEM'''
-    p[0] = p[1]
-    pass
-
 ## una constante que su valor entero debe de ser estre 1 y 4095
 # @param p arreglo mapeado con los simbolos gramaticales de la regla 
 def p_constante(p):
@@ -578,108 +644,66 @@ def p_constante(p):
 # de tipo m 
 # @param p arreglo mapeado con los simbolos gramaticales de la regla 
 def p_simple_m_etiqueta(p):
-    ''' SIMPLEM : OP_3_4 ETIQUETA
-                | OP_3_4 ETIQUETA DIR'''
+    ''' SIMPLE : OP_3_4 _EXP
+                | OP_3_4 _EXP DIR'''
     if parse.pasada == 2:
-      label = p[2]
-      valid_label = True
-      if not label in symbols:
-          symbols[label] = "7FFFH"
-          insert_warning(str(p.lineno(2)),"No existe la etiqueta "+label)
-          valid_label = False
-      m = symbols[p[2]]
+      exp = p[2]
+      type_exp = check_is_valid_exp(parse.lineno,exp[1])
+      c = (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1)
+      if c or type_exp == "relativo":
+          is_c = False
+      else:
+          is_c = True
       index = len(p) == 4
       op = p[1]
+      m = conv.exp_to_hexadecimal(exp[0])
       if extencion == "s": 
           string = step2.operations_code(op,m,index)
           p[0]=string
-          p[0]=[string,pc[p.lineno(2)-1]]
+          p[0]=[string,pc[parse.lineno-1]]
       else:
           is_index = len(p) == 4
-          cp = pc[p.lineno(2)]
+          cp = pc[parse.lineno]
           format_type = 3
-          num_line = p.lineno(2)
+          num_line = parse.lineno
           dir_type ="Simple"
-          p[0] = [cp,op,m,format_type,num_line,dir_type,False,is_index,pc[p.lineno(2)-1],valid_label]
+          p[0] = [cp,op,m,format_type,num_line,dir_type,is_c,is_index,pc[parse.lineno-1],type_exp]
     pass
-
-
-## instrucciones de operaciones con direccionamiento  simple y con un argumento 
-# de tipo c (constante)
-# @param p arreglo mapeado con los simbolos gramaticales de la regla 
-def p_simple_c(p):
-    ''' SIMPLEC : OP_3_4 CONSTANT
-                | OP_3_4 CONSTANT DIR'''
-    if parse.pasada == 2:
-        m = p[2]
-        op = p[1]
-        is_index = len(p) == 4
-        cp = pc[p.lineno(2)]
-        format_type = 3
-        num_line = p.lineno(2)
-        dir_type ="Simple"
-        p[0] = [cp,op,m,format_type,num_line,dir_type,True,is_index,pc[p.lineno(2)-1],True]
-    pass
-
 
 def p_indirecto_constante(p):
-   '''INDIRECTO : OP_3_4 AT CONSTANT '''
+   '''INDIRECTO : OP_3_4 AT _EXP '''
    if parse.pasada == 2:
-        m = p[3]
-        op = p[1]
-        cp = pc[p.lineno(2)]
-        format_type = 3
-        num_line = p.lineno(2)
-        dir_type ="Indirecto"
-        p[0] = [cp,op,m,format_type,num_line,dir_type,True,False,pc[p.lineno(2)-1],True]
+       exp = p[3]
+       type_exp = check_is_valid_exp(p.lineno(2),exp[1])
+       if (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) or type_exp == "relativo":
+           is_c = False
+       else:
+           is_c = True
+       m = conv.exp_to_hexadecimal(exp[0])
+       op = p[1]
+       cp = pc[p.lineno(2)]
+       format_type = 3
+       num_line = p.lineno(2)
+       dir_type ="Indirecto"
+       p[0] = [cp,op,m,format_type,num_line,dir_type,is_c,False,pc[p.lineno(2)-1],type_exp]
    pass
-
-def p_indirecto_etiqueta(p):
-    '''INDIRECTO : OP_3_4 AT ETIQUETA'''
-    if parse.pasada == 2:
-      label = p[3]
-      valid_label = True
-      if not label in symbols:
-          symbols[label] = "7FFFH"
-          insert_warning(str(p.lineno(2)),"No existe la etiqueta "+label)
-          valid_label = False
-      m = symbols[p[3]]
-      op = p[1]
-      cp = pc[p.lineno(2)]
-      format_type = 3
-      num_line = p.lineno(2)
-      dir_type ="Indirecto"
-      p[0] = [cp,op,m,format_type,num_line,dir_type,False,False,pc[p.lineno(2)-1],valid_label]
-    pass
     
 def p_inmediato_constante(p):
-    '''INMEDIATO : OP_3_4 HASHTAG CONSTANT'''
+    '''INMEDIATO : OP_3_4 HASHTAG _EXP'''
     if parse.pasada == 2:
-        m = p[3]
-        op = p[1]
-        cp = pc[p.lineno(2)]
-        format_type = 3
-        num_line = p.lineno(2)
-        dir_type ="Inmediato"
-        p[0] = [cp,op,m,format_type,num_line,dir_type,True,False,pc[p.lineno(2)-1],True]
-    pass 
-
-def p_inmediato_etiqueta(p):
-    '''INMEDIATO : OP_3_4 HASHTAG ETIQUETA'''
-    if parse.pasada == 2:
-      label = p[3]
-      valid_label = True
-      if not label in symbols:
-          symbols[label] = "7FFFH"
-          insert_warning(str(p.lineno(2)),"No existe la etiqueta "+label)
-          valid_label = False
-      m = symbols[p[3]]
-      op = p[1]
-      cp = pc[p.lineno(2)]
-      format_type = 3
-      num_line = p.lineno(2)
-      dir_type ="Inmediato"
-      p[0] = [cp,op,m,format_type,num_line,dir_type,False,False,pc[p.lineno(2)-1],valid_label]
+       exp = p[3]
+       type_exp = check_is_valid_exp(p.lineno(2),exp[1])
+       if (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) or type_exp == "relativo":
+           is_c = False
+       else:
+           is_c = True
+       m = conv.exp_to_hexadecimal(exp[0])
+       op = p[1]
+       cp = pc[p.lineno(2)]
+       format_type = 3
+       num_line = p.lineno(2)
+       dir_type ="Inmediato"
+       p[0] = [cp,op,m,format_type,num_line,dir_type,is_c,False,pc[p.lineno(2)-1],type_exp]
     pass
 
 def p_operation_3_4(p):
@@ -687,8 +711,6 @@ def p_operation_3_4(p):
                 | OP_XE'''
     p[0]=p[1]
     pass
-
-        
 
 def p_operation_S(p):
     ''' OP_S : ADD
@@ -739,7 +761,253 @@ def p_operation_XE(p):
         if extencion == "s":
             insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     p[0]=p[1]
+#==============================================================================
+#     Expresiones
+#==============================================================================
+def p_exp(p):
+    '_EXP : _M  _E _FIN'
+    p[0] = p[2]
+    
+    pass
 
+def p_final_marcador(p):
+    '_FIN :'
+    parse.evalua = False
+    pass
+
+def p_marcador(p):
+    '_M : '
+    if p[-1]== "EQU":
+        parse.evalua = True
+    else:
+        parse.evalua = False
+    parse.list_exp =[]
+    parse.lista_symb=["+"]
+    parse.first_type = ""
+    parse.lineno = 0
+    pass
+
+##regla gramatica para la suma de dos expresiones
+#@param p arreglo mapeado con los simbolos gramaticales de la regla 
+def p_expresion_plus(p):
+    '_E : _E PLUS _T '
+    if parse.pasada == 2 or parse.evalua:
+        type1 = p[1][1]
+        type2 = p[3][1]
+        error = check_error(type1,type2)
+        if not error:
+            if type2 == type1:
+                type0 = "absoluto"
+            else:
+                type0 = "relativo"
+            res = p[1][0] + p[3][0]
+            p[0] = [res,type0]
+        else:
+            p[0]=[-1,"error"]
+    pass
+
+
+##regla gramatica para la resta de dos expresiones
+#@param p arreglo mapeado con los simbolos gramaticales de la regla 
+def p_expresion_minus(p):
+    '_E : _E  MINUS _T '
+    if parse.pasada == 2 or parse.evalua:
+        type1 = p[1][1]
+        type2 = p[3][1]
+        error = check_error(type1,type2)
+        if not error:
+            if type2 == type1:
+                type0 = "absoluto"
+            elif type1 == "relativo":
+                type0 = "relativo"
+            else:
+                error = True
+            if not error:
+                res = p[1][0] - p[3][0]
+                p[0] = [res,type0]                
+            else:
+                error = True
+        if error:
+            p[0] = [-1,"error"]
+    pass
+
+##regla gramatica para la multiplicacion de dos expresiones
+#@param p arreglo mapeado con los simbolos gramaticales de la regla 
+def p_expresion_multi(p):
+    '_T : _T MULTI _F '
+    if parse.pasada == 2 or parse.evalua:
+        type1 = p[1][1]
+        type2 = p[3][1]
+        error = check_error(type1,type2)
+        if not error:
+            if equal_type(type1,type2,"absoluto"):
+                res = p[1][0] * p[3][0]
+                p[0] = [int(res),"absoluto"]
+            else:
+                error = True
+        if error:
+            p[0] = [-1,"error"]
+    
+    pass
+##regla gramatica para la divicion de dos expresiones
+#@param p arreglo mapeado con los simbolos gramaticales de la regla 
+def p_expresion_div(p):
+    '_T : _T DIVI _F '
+    if parse.pasada == 2 or parse.evalua:
+        error = False
+        if p[3][0] == 0:
+            insert_error(p.lineno(2),"No se puede dividir un numero entre cero")
+            error = True
+        else:
+            type1 = p[1][1]
+            type2 = p[3][1]
+            if not check_error(type1,type2):
+                if equal_type(type1,type2,"absoluto"):
+                    res = p[1][0] / p[3][0]
+                    p[0] = [int(res),"absoluto"]
+                else:
+                    error = True
+            else:
+                error = True
+        if error:
+            p[0] = [-1,"error"]
+    pass
+
+def p_expresion_single(p):
+    ''' _E : _T
+        _T : _F
+    '''
+    if parse.pasada == 2 or parse.evalua:    
+        p[0] = p[1]
+
+def p_f_constant(p):
+    '_F : CONSTANT'
+    if parse.pasada == 2 or parse.evalua:
+        if parse.first_type == "":
+            parse.first_type = "CONSTANT"
+            parse.lineno = p.lineno(1)
+        numeric_val = conv.to_decimal(p[1])
+        p[0] = [numeric_val,"absoluto"]
+        check_sign(p,"absoluto")
+    pass
+
+def p_f_etiqueta(p):
+    '_F : ETIQUETA '
+    if parse.pasada == 2 or parse.evalua:
+        if parse.first_type == "":
+            parse.first_type = "ETIQUETA"
+            parse.lineno = p.lineno(1)
+        symb = exist_symbol(p[1]) 
+        if not symb:
+            if parse.pasada == 2:
+                insert_warning(str(p.lineno(1)),"El simbolo no existe") 
+            else:
+                insert_error(str(p.lineno(1)),"El simbolo no existe")
+            val = conv.to_decimal("7FFFH")
+            p[0] = [val,"error"]
+            parse.lista_symb.append("error")
+        else:
+            numeric_val = conv.to_decimal(symb.get_dir_val())
+            p[0] = [numeric_val,symb.get_sym_type()]
+            check_sign(p,symb.get_sym_type())                  
+    pass
+
+def check_sign(p,symb_type):
+    sign = p[-1]            
+    if  not(sign == "-" or sign == "+"):
+        sign = "+"
+    sign = check_result_sign(sign)
+    parse.list_exp.append(sign+symb_type)
+    
+def p_f_expresion(p):
+    ' _F : _MARC1 _E _MARC2'
+    if parse.pasada == 2 or parse.evalua:
+        p[0] = p[2]    
+    pass
+
+
+def p_mar1(p):
+    '_MARC1 : PARENO'
+    if p[-1] == "-" or p[-1] == "+":
+        sign = check_result_sign(p[-1])
+        parse.lista_symb.append(sign)
+    else:
+        parse.lista_symb.append(parse.lista_symb[-1])
+    pass
+
+def p_marcador2(p):
+    '_MARC2 : PARENC'
+    parse.lista_symb.pop(-1)      
+    pass
+    
+def check_result_sign(sig):
+    if sig == parse.lista_symb[-1]:
+        return "+"
+    else:
+        return "-"
+    
+def check_is_valid_exp(lineno,type_result):
+    if not type_result == "error":
+        l = reduce_expretion()
+        if list_all_absolute(l):
+            return "absoluto"
+        else:
+            dicc = num_relative(l)
+            if dicc['+'] == 1:
+                return "relativo"
+    if not str(lineno) in warnings:
+        insert_error(str(lineno),"Expresion no valida")
+    return "error"
+    
+def list_all_absolute(l):
+    for index in l:
+        if index[1:] == "relativo":
+            return False
+        return True
+
+def num_relative(l):
+    count_p = 0
+    count_n = 0    
+    for index in l:
+        sign = index[0]
+        str_index = index[1:]
+        if str_index == "relativo":
+            if sign == "+":
+                count_p += 1
+            else:
+                count_n += 1
+    return {'+':count_p,'-':count_n}
+        
+def reduce_expretion():
+    
+    l = parse.list_exp
+    it = 0
+    while it < len(l):
+        inc = True
+        index = l[it]
+        sign = index[0]
+        str_index = index[1:]
+        if str_index == "relativo":
+            n_sign = "+"
+            if sign == "+":
+                n_sign = "-"
+            new_index = n_sign + str_index
+            if new_index in l:
+                l.remove(new_index)
+                l.remove(index)
+                l.append("+absoluto")
+                inc = False
+                it = 0
+        if inc:
+            it += 1
+    return l
+            
+        
+        
+    
+#==============================================================================
+#       Errores 
+#==============================================================================
 ## cuando el analizador detecta un error o una regla no empareja 
 #se llama este metodo el cual inserta el error en el diccionario de errores sintacticos
 #@param t donde viene el token que produjo el error
@@ -750,7 +1018,8 @@ def p_error(t):
           token = t.value[0]
       else:
           token = get_token(t.value)
-      insert_error(line_error,"No se reconoce el token "+ token)
+      if not token == "\n":
+          insert_error(line_error,"No se reconoce el token "+ token)
       yacc.errok()
       if len(pc)==0:
           pc.append("0000H")
@@ -761,7 +1030,11 @@ def p_error(t):
   else:
       print "NONE"
 
-  
 parse = yacc.yacc()
 parse.inicial = "0H"
 parse.pasada = 1
+parse.evalua = False
+parse.lista_symb=["+"]
+parse.list_exp =[]
+parse.first_type = ""
+parse.lineno = -1
