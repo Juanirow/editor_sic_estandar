@@ -156,6 +156,13 @@ def p_directiva_start(p):
     '''
     if parse.pasada == 1:
         s = p[3]
+        val = conv.to_decimal(s)
+        if extencion == "s":
+            if val == 0:
+                insert_error(str(p.lineno(1)),"La Sic estandar no soporta direcciones relativas")
+        else:
+            if val > 0:
+                insert_error(str(p.lineno(1)),"La SIC Extendida no soporta direcciones absolutas")
         if conv.is_hexadecimal(s):
             val = p[3]
         elif s == "0":
@@ -229,6 +236,8 @@ def p_org(p):
 def p_directiva_equ_multi(p):
     'DC : ETIQUETA EQU MULTI'
     if parse.pasada == 1:
+        if extencion == "s":
+            insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
         insert_symbol(p[1],pc[-1],"relativo",p.lineno(1))
         increment_PC(0)
     else:
@@ -238,6 +247,8 @@ def p_directiva_equ_multi(p):
 def p_directiva_equ_exp(p):
     'DC : ETIQUETA EQU _EXP'
     if parse.pasada == 1:
+        if extencion == "s":
+            insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
         exp = p[3]
         type_exp = check_is_valid_exp(p.lineno(1),exp[1])
 #        val = exp[0]
@@ -336,6 +347,7 @@ def p_directiva_base(p):
   | DIR_BASE
   '''
   if parse.pasada == 1:
+      
       if len(p) == 3:
           insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
       increment_PC(0)
@@ -353,6 +365,8 @@ def p_directiva_base_valor(p):
           dir = "0FFFFFH"
         obj_code.append("")
         step2.base = dir
+    elif extencion == "s":
+          insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
     pass
 
 def p_directiva_base_valor_etiqueta(p):
@@ -362,6 +376,8 @@ def p_directiva_base_valor_etiqueta(p):
         obj_code.append("")
         decimal = conv.to_decimal(p[2])
         step2.base = conv.decimal_to_hexadecimal(decimal)
+    elif extencion == "s":
+          insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
     pass
 
 ##  checa si las directivas para reservar memoria e incrementa el contador de 
@@ -613,6 +629,11 @@ def p_instruccion_4(p):
         p[0]=4
     else:
         l = p[2]
+        val = conv.to_decimal(l[2])
+        b1 = parse.first_type == "CONSTANT" and len(parse.list_exp) == 1 and val<4095
+        b2 = l[9] == "absoluto" and val<4095
+        if b1 or b2:
+            insert_error(str(p.lineno(1)),"Formato 4 no valido")
         code = step2.operation_type_3_4(l[0],l[1],l[2],4,l[4],l[5],l[6],l[7],l[9])
         p[0]=[code,l[8]]
     pass
@@ -649,8 +670,8 @@ def p_simple_m_etiqueta(p):
     if parse.pasada == 2:
       exp = p[2]
       type_exp = check_is_valid_exp(parse.lineno,exp[1])
-      c = (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1)
-      if c or type_exp == "relativo":
+#      c = (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) and type_exp == "absoluto"
+      if type_exp == "relativo":
           is_c = False
       else:
           is_c = True

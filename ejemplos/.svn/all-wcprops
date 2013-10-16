@@ -1,53 +1,113 @@
 K 25
 svn:wc:ra_dav:version-url
-V 48
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos
-END
-ejemplo1.os
-K 25
-svn:wc:ra_dav:version-url
-V 60
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/ejemplo1.os
-END
-ejemplo1.s
-K 25
-svn:wc:ra_dav:version-url
-V 59
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/ejemplo1.s
-END
-ejemplo2.os
-K 25
-svn:wc:ra_dav:version-url
-V 60
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/ejemplo2.os
-END
-ejemplo2.s
-K 25
-svn:wc:ra_dav:version-url
-V 59
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/ejemplo2.s
-END
-ejemplo3.os
-K 25
-svn:wc:ra_dav:version-url
-V 60
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/ejemplo3.os
+V 26
+/lab/!svn/ver/666/ejemplos
 END
 ejemplo3.s
 K 25
 svn:wc:ra_dav:version-url
-V 59
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/ejemplo3.s
+V 37
+/lab/!svn/ver/325/ejemplos/ejemplo3.s
+END
+copy.x
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/lab/!svn/ver/625/ejemplos/copy.x
+END
+ejercicio.ox
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/lab/!svn/ver/625/ejemplos/ejercicio.ox
+END
+ejemplo1.x
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/lab/!svn/ver/625/ejemplos/ejemplo1.x
+END
+exa2.ox
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/lab/!svn/ver/625/ejemplos/exa2.ox
+END
+expresiones.ox
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/lab/!svn/ver/666/ejemplos/expresiones.ox
 END
 copy.os
 K 25
 svn:wc:ra_dav:version-url
-V 56
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/copy.os
+V 34
+/lab/!svn/ver/413/ejemplos/copy.os
+END
+ejemplo1.os
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/lab/!svn/ver/326/ejemplos/ejemplo1.os
+END
+ejemplo2.os
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/lab/!svn/ver/326/ejemplos/ejemplo2.os
+END
+ejemplo3.os
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/lab/!svn/ver/326/ejemplos/ejemplo3.os
+END
+copy.ox
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/lab/!svn/ver/625/ejemplos/copy.ox
+END
+ejemplo1.ox
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/lab/!svn/ver/625/ejemplos/ejemplo1.ox
+END
+ejercicio.x
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/lab/!svn/ver/625/ejemplos/ejercicio.x
+END
+exa2.x
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/lab/!svn/ver/625/ejemplos/exa2.x
+END
+expresiones.x
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/lab/!svn/ver/625/ejemplos/expresiones.x
 END
 copy.s
 K 25
 svn:wc:ra_dav:version-url
-V 55
-/lab/!svn/ver/330/jmhernandez/practica3/ejemplos/copy.s
+V 33
+/lab/!svn/ver/325/ejemplos/copy.s
+END
+ejemplo1.s
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/lab/!svn/ver/325/ejemplos/ejemplo1.s
+END
+ejemplo2.s
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/lab/!svn/ver/325/ejemplos/ejemplo2.s
 END
