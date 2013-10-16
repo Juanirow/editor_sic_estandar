@@ -408,6 +408,9 @@ def p_nemonico_directivas_hex(p):
 def p_directiva_word(p):
     'NEMDIRECTIVA : WORD _EXP'
     if parse.pasada == 2:
+      if extencion == "s":
+        if not len(parse.list_exp) == 1:
+          insert_error(str(p.lineno(1)),"WORD No soporta expresiones en la sic Estandar")
         exp = p[2]
         res = check_is_valid_exp(p.lineno(1),exp[1])
         if res == "relativo":
