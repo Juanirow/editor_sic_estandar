@@ -9,8 +9,9 @@
 
 from my_file import File
 from parser import parse
-from step2 import Step2
+from displacement import Displacement
 import parser
+from segment import Segment
 import scanner
 
 class Ensamblador:
@@ -23,159 +24,36 @@ class Ensamblador:
         self.init()
         file_name = file
         fi = File()
+        print "==============="
         if fi.open(file_name):
             text = fi.read()
-            parser.extencion = fi.extension
+            parser.seg.new_segment(fi.name)
+            parser.extension = fi.extension
             text_file=self.new_line_filter(text)
             list_text = text_file.split("\n")
-#            scanner.entrada(text_file)
+            parser.load_code(list_text)
+            # scanner.entrada(text_file)
+            # parser.scann.lineno = 1
             parse.parse(text_file)
-            file_name = fi.name
-            fo = File()
-            print "============"
-            fo.create_file(file_name,"t"+fi.extension)
-            if parser.num_errors() == 0: 
-                parse.pasada=2
+            if parser.num_errors() == 0:
+                parse.pasada = 2
+                parser.seg.genera_tabla_bloques()
                 parser.scann.lineno = 1
+                parser.scann.linea = 1
+                parse.last_index = 0
+                parser.seg.index = 0
                 parse.parse(text_file)
-                len_p = parser.get_len_program()
-                fi.close()
-                print "Del archivo "+fo.name
-                print "Errores: "+str(parser.num_errors())
-                print "Warnings: " +str(len(parser.warnings))
-                fo.write("Tamaño del Programa:" + str(len_p)+"\n\n")
-                self.print_program(fo,list_text)
-                fo.write("\n\n")
-                self.print_symbols(fo)
-                if parser.num_errors()==0:
-                    fo_obj = File()
-                    fo_obj.create_file(file_name,"o"+parser.extencion)
-                    self.print_obj_file(fo_obj)                   
-            else:
-                print "No se realizo el paso 2"
-                len_p = parser.get_len_program()
-                fi.close()
-                print "Del archivo "+fo.name
-                print "Errores: "+str(parser.num_errors())
-                print "Warnings: " +str(len(parser.warnings))
-                fo.write("Tamaño del Programa:" + str(len_p)+"\n\n")
-                self.print_program(fo,list_text)
-                fo.write("\n\n")
-                self.print_symbols(fo)
-            print parser.errors
-            fo.close()
-            
+            parser.seg.print_results(fi.extension)
+                
     ##inicializa los valores usados en analisis lexico y sintactico
     def init(self):
-        parser.step2 = Step2()
-        parser.scann.lineno = 1        
-        parser.errors = {}
-        parser.dir_init = ""
-        parser.pc = []
-        parser.obj_code=[]
-        parser.symbols = []
+        parser.scann.lineno = 1
+        parser.scann.linea = 1
         parse.pasada=1
         parse.inicial = "0H"
-        parser.warnings = {}
-            
-    ## concatena una lista de strings para formar un unico texto
-    #@param list: lista de cadenas que se concatenara
-    #@return regresa un string        
-    def list_to_string(self,list):
-        text = ""
-        for line in list:
-            text += line
-        return text
-    
-    
-    
-    ## regresa los errores de una linea de codigo
-    # @param line linea de codigo la cual se busca si tubo un error
-    # @return errores lexicos y sintacticos de la linea de codigo
-    def get_line_error(self,line):
-        error_s = parser.scann.errors.get(str(line),"")
-        error_p = parser.errors.get(str(line),"")
-        warning = parser.warnings.get(str(line),"")
-        if error_s == "":
-            error = error_p
-        else:
-            error = error_s + "\t" + error_p
-        return error + "\t"+ warning
-        
-    ## genera una cadena de espacios (caracter) con una longitud calculada
-    #por un numero dado menos el tamaño de una cadena
-    # @param string cadena la cual se le restara al numero maximo de espacios 
-    # @num numero maximo de espacios que se quiere
-    #@return cadena con espacios en blanco calculados
-    def str_space(self,string,num):
-        val = len(string)
-        cad = " "
-        while val < num:
-            cad += " "
-            val += 1
-        return cad
-
-    ##imprime en un archivo el codigo de entrada pero con contador de programa y errores 
-    #@param file archivo de salida
-    #@param lista de cadenas que forman el archivo
-#    def print_program(self,file,list):
-#        file.write("Archivo intermedio\n")
-#        ite = 0
-#        while ite < len(list):
-#            error = self.get_line_error(ite+1)
-#            code = list[ite]
-#            if not code == "":
-#                string = list[ite]
-#                string = parser.pc[ite] + "\t" + string+ self.str_space(string,30)
-#                if ite < len(parser.obj_code):
-#                    string += parser.obj_code[ite] + "\t" 
-#                string += error +"\n"
-#                file.write(string)
-#            ite += 1
-
-    def print_program(self,file,list):
-        file.write("Archivo intermedio\n")
-        ite = 0
-        while ite < len(list):
-            error = self.get_line_error(ite+1)
-            code = list[ite]
-            if not code == "":
-                string = list[ite]
-                string = self.filter_code(string)
-                string = parser.pc[ite] + "\t" + string
-                if ite < len(parser.obj_code):
-                    string += parser.obj_code[ite] + "\t" 
-                string += error +"\n"
-                file.write(string)
-            ite += 1
-            
-    def filter_code(self,str_code):
-        list_code = str_code.split("\t")
-        str_code = ""
-        for it in list_code:
-            str_code += it +" "
-        list_code = str_code.split(" ")
-        while "" in list_code:
-            list_code.remove("")
-        num = len(list_code)
-        it = 0 
-        str_code = ""
-        while it < 3:
-            if it < num:
-                str_code += list_code[it]
-            str_code += "\t"
-            it += 1
-        return str_code
-    
-    ## imprime la tabla de simbolos
-    # @param fo archivo donde se imprimiran los simbolos      
-    def print_symbols(self,fo):
-        fo.write("Tabla de Simbolos \n\n")
-        for s in parser.symbols:
-            string = s.get_name()+"\t"
-            string += str(s.get_dir_val())+"\t"
-            string += s.get_sym_type()+"\n"            
-            fo.write(string)
+        parse.list_code = []
+        parser.seg = Segment()
+        parse.last_index = 0
     
     ## elimina los saltos de linea consecutivos 
     # @param str cadena a la que se le eliminaran los saltos de linea          
@@ -183,24 +61,8 @@ class Ensamblador:
         list_str = str.split('\n')
         cad =""
         for str in list_str:
-            if not str == "": 
+            if not str == "" and not str == "\t": 
                 cad += str+"\n"
-        return cad
-    
-    ## imprime los registros que forman el archivo objeto
-    # @param fo archivo donde se imprimiran los registros
-    def print_obj_file(self,fo):
-        for s in parser.step2.list_registers:
-            fo.write(s+"\n")     
-    
-    def print_error_step1(self,fo,list):
-        it = 0
-        len_p = len(list)
-        while it < len_p:
-            code = list[it]
-            if not code == "":
-                error = parser.pc[it]+ "\t"+list[it]+" \t"+self.get_line_error(it+1)
-                fo.write(error+"\n")
-            it += 1
+        return cad    
 
             

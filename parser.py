@@ -13,113 +13,51 @@ import ply.yacc as yacc
 from convert import Convert
 from displacement import Displacement
 from hexadecimal import Hexadecimal
-from step2 import Step2
 from register import Register
-from symbol import Symbol
+from segment import Segment
 
+seg = Segment()
 hex = Hexadecimal()
 conv = Convert()
 disp = Displacement()
-step2 = Step2()
 reg = Register("R")
-errors = {}
-warnings = {}
-dir_init = ""
-pc = []
-obj_code=[]
-symbols = []
-
-extencion =""
-base = 0
-
+extension =""
 registers = {"A":0,"X":1,"L":2,"CP":8,"SW":9,"B":3,"S":4,"T":5,"F":6}
-## regresa el codigo objeto de cada linea
-# @return lista de cadenas de bytes que representan el codigo objeto de cada
-#instruccion
-def get_obj_code():
-    return obj_code
 
-## regresa los registros del archivo objeto
-#@return lista de cadenas que representan los registros de el archivo fuente
-def get_registers():
-    return step2.list_registers
+## carga el codigo en la lista de codigo y le elimina los 
+# nodos vacios 
+def load_code(code):
+    parse.list_code = code
+    delete_spaces(parse.list_code)
 
-##inserta una etiqueta a la tabla de simbolos y si esta ya se encuentra marca un error
-#@param name simbolo que se intentara insertar a la tabla
-#@param dir_val direccion o valor del simbolo
-#@param sym_type tipo del simbolo el cual puede ser relativo o absoluto
-#@param lineno numero de linea donde se encontro la etiqueta
-def insert_symbol(name,dir_val,sym_type,lineno):
-    if exist_symbol(name):
-        insert_error(lineno,"etiqueta previamente definida")
-    else:
-        sym = Symbol(name,dir_val,sym_type)
-        symbols.append(sym)
-        
-def exist_symbol(name):
-    for it in symbols:
-        if it.get_name() == name:
-            return it
-    return None
-        
-## calcula el tamaÃ±o del programa 
-#@return regresa en hexadecimal el tamaÃ±o del programa
-def get_len_program():
-    num1 = conv.to_decimal(parse.inicial)
-    num2 = conv.to_decimal(pc[-1])
-    res = num2 - num1
-    return conv.decimal_to_hexadecimal(res)
 
+def delete_spaces(code):
+    it = 0
+    while it < len(code):
+        item = code[it]
+        if item.strip() == "":
+            code.remove(item)
+        else:
+            it += 1
 ## obtiene el numero de errores lexicos y sintacticos obtenidos
 # @return regresa la suma de los errores lexicos y sintacticos
 def num_errors():
-    e1 = len(scann.errors)
-    e2 = len(errors)
- 
-    return e1+e2
+    return seg.get_num_errors_all()
+    # print seg.get_segment().errors
+    # print seg.get_segment().errors_s
+    # e1 = len(seg.get_segment().errors_s)
+    # e2 = len(seg.get_segment().errors)
+    # return e1+e2
     
 ##regresa los errores obtenidos en la parte lexica
 #@return errores lexicos en un diccionario    
 def get_lexic_errors():
   return scann.errors
 
-##regresa los errores obtenidos en la parte sintactica
-#@return errores sintacticos en un diccionario  
-def get_sintactic_errors():
-    return errors 
-
 ##regresa el siguiente token de una cadena separada por '
 #@return siguiente token a analizar
 def get_token(value):
   return value.split("\n")[0]
-
-##checa si en el diccionario de errores ya se inserto un error en esa linea de codigo
-#y si no es asi la inserta 
-#@param line linea de codigo donde se encontro un error
-#@param text cadena que se genera en el error
-def insert_error(line,text):
-  if not line in errors:
-    errors[line]= text
-    
-##checa si en el diccionario de advertencias ya se inserto un error en esa linea de codigo
-#y si no es asi la inserta 
-#@param line linea de codigo donde se encontro un warnind
-#@param text cadena que se genera en el warning
-def insert_warning(line,text):
-  if not line in errors:
-    warnings[line]= text
-
-##aumenta el contador de programa 
-#@param increment cantidad en hexadecimal que se le agregara al CP
-def increment_PC(increment):
-    num1 = pc[-1]
-    if not conv.is_hexadecimal(str(increment)):
-        increment = conv.decimal_to_hexadecimal(increment)
-    val = hex.plus(num1,increment)
-    if val == "H":
-        val = "0H"
-    val = reg.adjust_bytes(val,6,False)
-    pc.append(val+"H")
     
 def equal_type(type1,type2,sym_type):
     if type1 == sym_type:
@@ -129,8 +67,21 @@ def equal_type(type1,type2,sym_type):
     
 def check_error(type1,type2):
     return type1 == "error" or type2 == "error"
-            
-        
+
+def get_line_at(line):
+    return line - parse.last_index
+    
+def get_pc_at(line):
+    line_n = line - parse.last_index
+    pc =  seg.get_segment().pc[line_n]
+    # print "parserL141",line,line_n,seg.get_segment().pc,parse.last_index,pc
+    return pc
+
+def get_bloque_at(line):
+    line_n = line - parse.last_index
+    # print "parserL141",line,line_n,seg.get_segment().num_bloque,parse.last_index
+    return seg.get_segment().num_bloque[line_n]
+    
 
 #==============================================================================
 #                       Reglas Gramaticales
@@ -141,8 +92,8 @@ def check_error(type1,type2):
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_inicial(p):
   '''
-    INI : DS _SALTO C DE _SALTO
-        | DS _SALTO C DE 
+    INI : DS C DE _SALTO
+        | DS C DE 
   '''
   pass 
 
@@ -151,34 +102,160 @@ def p_inicial(p):
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_directiva_start(p):
     '''
-    DS : ETIQUETA START HEX
-    | ETIQUETA START DECIMAL
+    DS : ETIQUETA START HEX _SALTO _D
+    | ETIQUETA START DECIMAL _SALTO _D
     '''
+    list_e = p[5]
     if parse.pasada == 1:
+        seg.get_segment().bloques.nuevo_bloque("por omision")
+        seg.get_segment().name = p[1]
         s = p[3]
         val = conv.to_decimal(s)
-        if extencion == "s":
+        if extension == "s":
             if val == 0:
-                insert_error(str(p.lineno(1)),"La Sic estandar no soporta direcciones relativas")
+                seg.insert_error(str(p.lineno(1)),"La Sic estandar no soporta direcciones relativas")
         else:
             if val > 0:
-                insert_error(str(p.lineno(1)),"La SIC Extendida no soporta direcciones absolutas")
+                seg.insert_error(str(p.lineno(1)),"La SIC Extendida no soporta direcciones absolutas")
         if conv.is_hexadecimal(s):
             val = p[3]
         elif s == "0":
             val = "000000H"
         else:
             val = conv.decimal_to_hexadecimal(s)
-        parse.inicial = val
-        pc.append(parse.inicial)
-        pc.append(parse.inicial)
+        seg.get_segment().inicial = val
+        seg.get_segment().bloques.set_load_dir(val)
+        seg.get_segment().pc.append(seg.get_segment().inicial)
+        seg.get_segment().pc.append(seg.get_segment().inicial)
+        seg.get_segment().num_bloque.append(0)
+        seg.get_segment().num_bloque.append(0)
+        if list_e:
+            for item_l in list_e:
+                seg.increment_PC(0)
+                seg.get_segment().num_bloque.append(0)
+                if item_l[0] == "EXTREF":
+                    l_etiq = item_l[1]
+                    for item_etiq in l_etiq:
+                        seg.insert_symbol(item_etiq,"0H","_",0,0,True)
+                    seg.get_segment().step2.make_register_r(l_etiq)
+                    
+
     else:
-        length = get_len_program()
+        length = seg.get_len_program()
         if length == "H":
             length = "0H"
-        step2.directive_start(p[1],length,p[3])
-        obj_code.append("")   
+        seg.get_segment().step2.directive_start(p[1],length,p[3])
+        seg.get_segment().obj_code.append("")  
+        if list_e:
+            it = 0
+            while it < len(list_e):
+                seg.get_segment().obj_code.append("")
+                it += 1
+            for item_l in list_e:
+                if item_l[0] == "EXTDEF":
+                    l_etiq = item_l[1]
+                    seg.get_segment().step2.make_register_d(l_etiq,seg.get_segment().symbols)
 
+def p_extref(p):
+    '_D : EXTREF VAR _SALTO _D'
+    if parse.pasada == 1:
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"Directiva no valida para la sic estandar")
+    d_ant = p[4]    
+    p[0] = [["EXTREF",p[2]]]
+    if d_ant:
+        p[0]+=d_ant
+    pass
+
+def p_extdef(p):
+    '_D : EXTDEF VAR _SALTO _D'
+    if parse.pasada == 1:
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"Directiva no valida para la sic estandar")
+    d_ant = p[4]
+    p[0]= [["EXTDEF",p[2]]]
+    if d_ant:
+        p[0]+=d_ant 
+    pass
+
+def p_def_epsilon(p):
+    '_D : EPSILON'
+    p[0] = None
+    pass
+    
+def p_var(p):
+    'VAR : ETIQUETA VARP'
+    ret_list = [p[1]]
+    if type(p[2]) is list:
+        ret_list+=p[2]
+    p[0] = ret_list
+
+def p_var_p(p):
+    'VARP : COMMA ETIQUETA VARP'
+    ret_list = [p[2]]
+    if type(p[3]) is list:
+        ret_list+=p[3]
+    p[0] = ret_list
+    
+def p_var_p_eps(p):
+    'VARP : EPSILON'
+    p[0] = p[1]
+    
+def p_csect(p):
+    'CS : ETIQUETA CSECT _SALTO _D '
+    list_e = p[4]
+    line = p.lineno(1)-1
+
+    if parse.pasada == 1:
+        errors = errors_offset(scann.errors,line)
+        seg.get_segment().errors_s = errors
+        code =  parse.list_code[seg.last_code:line]
+        seg.get_segment().code = code
+        seg.last_code = line
+        parse.last_index = line
+        name = p[1].strip().lower()
+        seg.new_segment(name)
+        seg.get_segment().pc.append("00H")
+        seg.increment_PC(0)
+        seg.get_segment().num_bloque.append(0)
+        if list_e:
+            for item_l in list_e:
+                seg.increment_PC(0)
+                seg.get_segment().num_bloque.append(0)
+                if item_l[0] == "EXTREF":
+                    l_etiq = item_l[1]
+                    for item_etiq in l_etiq:
+                        seg.insert_symbol(item_etiq,"0H","_",0,0,True)
+                    seg.get_segment().step2.make_register_r(l_etiq)
+    else:
+        seg.last_code = line
+        parse.last_index = line
+        seg.index += 1
+        len_program = seg.get_segment().bloques.get_len_program()
+        seg.get_segment().step2.directive_start(seg.get_segment().name,len_program,seg.get_segment().pc[0])
+        seg.get_segment().obj_code.append("")
+        if list_e:
+            it = 0
+            while it < len(list_e):
+                seg.get_segment().obj_code.append("")
+                it += 1
+            for item_l in list_e:
+                if item_l[0] == "EXTDEF":
+                    l_etiq = item_l[1]
+                    seg.get_segment().step2.make_register_d(l_etiq,seg.get_segment().symbols)
+    pass
+
+
+def errors_offset(errors,line):
+    ret = {}
+    for e in errors:
+        # print errors[e]
+        val = int(e)-parse.last_index
+        if val > 0 and val < line:
+            ret[e] = errors[e]
+    return ret
+            
+        
 
 ## metodo que compara si una cadena (hexadecimal) es igual a 0
 #@param s cadena la cual es un numero diferente de 0
@@ -200,18 +277,20 @@ def p_directiva_end(p):
   '''
   if parse.pasada == 2:
       dir = ""
-      step2.complete_register()
-      step2.make_register_m(obj_code,pc)
+      seg.index = 0
       if len(p) == 3:
           dir = p[2]
-          sym = exist_symbol(dir)
+          sym = seg.exist_symbol(dir)
           if sym:
               dir = sym.get_dir_val()
           else:
-              insert_error(str(p.lineno(1)),"No se reconoce la etiqueta "+dir)
+              seg.insert_error(str(p.lineno(1)),"No se reconoce la etiqueta "+dir)
               dir = "000000H"
-      step2.directive_end(dir,pc[0])
-      obj_code.append("")
+      seg.get_segment().step2.directive_end(dir,seg.get_segment().pc[0])
+      seg.get_segment().obj_code.append("")
+  else:
+      seg.get_segment().code = parse.list_code[seg.last_code:-1]
+      seg.get_segment_at(0).code.append(parse.list_code[-1])
   pass 
  
 ## conjunto de instrucciones las cuales pueden ser directivas o codigos de operacion
@@ -221,6 +300,7 @@ def p_codigo(p):
   '''
   C : DC _SALTO C 
   | CP _SALTO C
+  | CS C
   | EPSILON
   '''
   pass 
@@ -229,35 +309,55 @@ def p_codigo(p):
 def p_org(p):
     'DC : ORG CONSTANT'
     if parse.pasada == 2:
-        obj_code.append("")
+        seg.get_segment().step2.complete_register()
+        seg.get_segment().obj_code.append("")
     else:
-        increment_PC(0)
+        seg.increment_PC(0)
+        seg.get_segment().pc[-1] = p[2]
     pass
+
 def p_directiva_equ_multi(p):
-    'DC : ETIQUETA EQU MULTI'
+    '''DC : ETIQUETA EQU MULTI'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
-        insert_symbol(p[1],pc[-1],"relativo",p.lineno(1))
-        increment_PC(0)
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
+        seg.insert_symbol(p[1],seg.get_segment().pc[-1],
+                        "relativo",p.lineno(1),seg.get_segment().bloques.get_index())
+        seg.increment_PC(0)
     else:
-        obj_code.append("")
+        seg.get_segment().obj_code.append("")
     pass
+
+def p_directiva_use(p):
+    '''DC : USE ETIQUETA 
+    | USE '''
+    if parse.pasada == 1:
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
+        if len(p) == 2:
+            seg.get_segment().bloques.nuevo_bloque("por omision")
+        else:
+            seg.get_segment().bloques.nuevo_bloque(p[2])
+        cp = seg.get_segment().bloques.get_last_cp()
+        seg.get_segment().pc[-1] = cp
+        seg.get_segment().num_bloque[-1] = seg.get_segment().bloques.get_index()
+        seg.increment_PC(0)
+    else:
+        seg.get_segment().step2.complete_register()
+        seg.get_segment().obj_code.append("")
 
 def p_directiva_equ_exp(p):
     'DC : ETIQUETA EQU _EXP'
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
         exp = p[3]
         type_exp = check_is_valid_exp(p.lineno(1),exp[1])
-#        val = exp[0]
-#        conv.exp_to_hexadecimal(val)
         val = conv.exp_to_hexadecimal(exp[0])
-        insert_symbol(p[1],val,type_exp,p.lineno(1))
-        increment_PC(0)
+        seg.insert_symbol(p[1],val,type_exp,p.lineno(1),seg.get_segment().bloques.get_index())
+        seg.increment_PC(0)
     else:
-        obj_code.append("")
+        seg.get_segment().obj_code.append("")
     pass
 
 ## regla de epsilon que produce a vacio
@@ -293,12 +393,22 @@ def p_directiva_byte(p):
       num = p[2]
   if parse.pasada == 1:
       if not symb == "":
-          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
-      increment_PC(num)
+          pc_val = get_pc_at(p.lineno(1)-1)
+          seg.insert_symbol(p[1],pc_val,"relativo",p.lineno(1),seg.get_segment().bloques.get_index())
+      seg.increment_PC(num)
   else:
-      str = step2.const_BYTE(num)
-      step2.insert_str(str,pc[p.lineno(1)-1])
-      obj_code.append(str)
+      str = seg.get_segment().step2.const_BYTE(num)
+      if extension == "x":
+          load_dir = seg.get_segment().bloques.get_load_dir_at(get_bloque_at(p.lineno(1)-1))
+          pc_val = get_pc_at(p.lineno(1)-1)
+          val = hex.plus(load_dir,pc_val)
+          if val == "H":
+              val = "0H"
+          val =  reg.adjust_bytes(val,6,False)   
+      else:
+          val = get_pc_at(p.lineno(1)-1)
+      seg.get_segment().step2.insert_str(str,val)
+      seg.get_segment().obj_code.append(str)
   pass 
 
 ## regla de las constantes para la directiva BYTE 
@@ -321,7 +431,7 @@ def p_byte_valor(p):
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_byte_valor_error(p):
   'BVALOR : error'
-  insert_error(str(p.lineno(1)),"Al definir la constante en la directiva Byte")
+  seg.insert_error(str(p.lineno(1)),"Al definir la constante en la directiva Byte")
   p[0] ="1"
 
 ## regla para las directivas las cuales pueden llevar una etiqueta 
@@ -334,11 +444,12 @@ def p_directivas(p):
   '''
   if parse.pasada == 1:
       if len(p) == 3:
-          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
+          pc_val = get_pc_at(p.lineno(1)-1)
+          seg.insert_symbol(p[1],pc_val,"relativo",p.lineno(1),seg.get_segment().bloques.get_index())
           inc = p[2]
       else:
           inc = p[1]
-      increment_PC(inc) 
+      seg.increment_PC(inc) 
   pass
 
 def p_directiva_base(p):
@@ -349,35 +460,36 @@ def p_directiva_base(p):
   if parse.pasada == 1:
       
       if len(p) == 3:
-          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
-      increment_PC(0)
+          pc_val = get_pc_at(p.lineno(1)-1)
+          seg.insert_symbol(p[1],pc_val,"relativo",p.lineno(1),seg.get_segment().bloques.get_index())
+      seg.increment_PC(0)
   pass
 
 def p_directiva_base_valor(p):
     '''DIR_BASE : BASE ETIQUETA'''
     if parse.pasada == 2:
         label = p[2]
-        sym = exist_symbol(label)
+        sym = seg.exist_symbol(label)
         if sym:
             dir = sym.get_dir_val()
         else:
-          insert_error(str(p.lineno(1)),"No se reconoce la etiqueta "+label)
+          seg.insert_error(str(p.lineno(1)),"No se reconoce la etiqueta "+label)
           dir = "0FFFFFH"
-        obj_code.append("")
-        step2.base = dir
-    elif extencion == "s":
-          insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
+        seg.get_segment().obj_code.append("")
+        seg.get_segment().step2.base = dir
+    elif extension == "s":
+          seg.insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
     pass
 
 def p_directiva_base_valor_etiqueta(p):
     '''DIR_BASE : BASE HEX
                 | BASE DECIMAL'''
     if parse.pasada == 2:
-        obj_code.append("")
+        seg.get_segment().obj_code.append("")
         decimal = conv.to_decimal(p[2])
-        step2.base = conv.decimal_to_hexadecimal(decimal)
-    elif extencion == "s":
-          insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
+        seg.get_segment().step2.base = conv.decimal_to_hexadecimal(decimal)
+    elif extension == "s":
+          seg.insert_error(str(p.lineno(1)),"Directiva no soportada por la sic estandar")
     pass
 
 ##  checa si las directivas para reservar memoria e incrementa el contador de 
@@ -397,36 +509,57 @@ def p_nemonico_directivas_hex(p):
       p[0]=inc
   else:
       if p[1] == "WORD":
-          val = step2.directive_word(str(val))
-          obj_code.append(val)
-          step2.insert_str(val,pc[p.lineno(2)-1])
+          val = seg.get_segment().step2.directive_word(str(val))
+          seg.get_segment().obj_code.append(val)
+          if extension == "x":
+              blq_val = get_bloque_at(p.lineno(2)-1)
+              load_dir = seg.get_segment().bloques.get_load_dir_at(blq_val)
+              pc_val = get_pc_at(p.lineno(2)-1)              
+              val2 = hex.plus(load_dir,pc_val)
+              if val2 == "H":
+                  val2 = "0H"
+              val2 =  reg.adjust_bytes(val2,6,False)
+          else:
+             val2 = get_pc_at(p.lineno(2)-1) 
+          seg.get_segment().step2.insert_str(val,val2)
       else:
-          step2.complete_register()
-          obj_code.append("")
+          seg.get_segment().step2.complete_register()
+          seg.get_segment().obj_code.append("")
   pass
 
 def p_directiva_word(p):
     'NEMDIRECTIVA : WORD _EXP'
     if parse.pasada == 2:
-      if extencion == "s":
-        if not len(parse.list_exp) == 1:
-          insert_error(str(p.lineno(1)),"WORD No soporta expresiones en la sic Estandar")
         exp = p[2]
-        res = check_is_valid_exp(p.lineno(1),exp[1])
-        if res == "relativo":
-            step2.m_modif_register.append(p.lineno(1))
+        if not exp[1] == "_":
+            res = check_is_valid_exp(p.lineno(1),exp[1])
+            if res == "relativo":
+                seg.get_segment().step2.m_modif_register.append(p.lineno(1)-parse.last_index)
+        else:
+            for it in exp[2]:
+                seg.get_segment().step2.list_word_m.append(it)
         val = int(p[2][0])
         val = conv.exp_to_hexadecimal(val)
-        val = step2.directive_word(str(val))
-        obj_code.append(val)
-        step2.insert_str(val,pc[p.lineno(1)-1])
+        val = seg.get_segment().step2.directive_word(str(val))
+        seg.get_segment().obj_code.append(val)
+        if extension == "x":
+            blq_val = get_bloque_at(p.lineno(1)-1)
+            load_dir = seg.get_segment().bloques.get_load_dir_at(blq_val)
+            pc_val = get_pc_at(p.lineno(1)-1)
+            val2 = hex.plus(load_dir,pc_val)
+            if val2 == "H":
+              val2 = "0H"
+            val2 =  reg.adjust_bytes(val2,6,False)
+        else:
+            val2 = get_pc_at(p.lineno(1)-1)
+        seg.get_segment().step2.insert_str(val,val2)
     p[0] = 3
 
 ## regresa un error si el valor para reservar esta mal declarado
 #@param p arreglo mapeado con los simbolos gramaticales de la regla
 def p_nemonico_directivas_error(p):
   '''NEMDIRECTIVA : NEMONICO error '''
-  insert_error(str(p.lineno(2)),"Se esperaba un numero decimal o hexadecimal")
+  seg.insert_error(str(p.lineno(2)),"Se esperaba un numero decimal o hexadecimal")
   p[0] = "error"
   pass
 
@@ -448,18 +581,30 @@ def p_codigo_operacion(p):
   | CI'''
   if parse.pasada == 1:
       if len(p)==3:
-          insert_symbol(p[1],pc[p.lineno(1)-1],"relativo",p.lineno(1))
+          pc_val = get_pc_at(p.lineno(1)-1)
+          seg.insert_symbol(p[1],pc_val,"relativo",p.lineno(1),seg.get_segment().bloques.get_index())
           val = p[2]
       else:
           val = p[1]
       val = conv.to_decimal(str(val))
-      increment_PC(val)
+      seg.increment_PC(val)
   else:
       list = p[1]
       if len(p) == 3:
           list = p[2]
-      step2.insert_str(list[0],list[1])
-      obj_code.append(list[0])
+      if extension == "s":
+          val = get_pc_at(list[1])
+      else:
+#          print "g48",seg.get_segment().num_bloque,list[1]
+          blq_val = get_bloque_at(list[1])
+          load_dir = seg.get_segment().bloques.get_load_dir_at(blq_val)
+          pc_val = get_pc_at(list[1])
+          val = hex.plus(load_dir,pc_val)
+          if val == "H":
+              val = "0H"
+          val =  reg.adjust_bytes(val,6,False)
+      seg.get_segment().step2.insert_str(list[0],val)
+      seg.get_segment().obj_code.append(list[0])
   pass
 
 ## conjunot de instrucciones que produce instruccones de 1 ,2 ,3 y 4 bytes 
@@ -482,13 +627,13 @@ def p_instrucciones_1(p):
              | SIO
              | TIO '''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
         p[0]=1
     else:
         operation = p[1]
-        code = step2.operations[operation]
-        line = pc[p.lineno(1)-1] 
+        code = seg.get_segment().step2.operations[operation]
+        line = p.lineno(1)-1
         p[0] = [code,line]
     pass
 
@@ -511,10 +656,10 @@ def p_inst_r(p):
     '''INS_2_R : TIXR REGISTER
                | CLEAR REGISTER'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     else:
-        p[0] = [step2.operations_type_2(p[1],p[2],""),pc[p.lineno(1)-1]]
+        p[0] = [seg.get_segment().step2.operations_type_2(p[1],p[2],""),p.lineno(1)-1]
     pass
 
 ## instrucciones de tipo 2 que tienen como parametro un numero entre 1 y 16
@@ -522,10 +667,10 @@ def p_inst_r(p):
 def p_inst_n(p):
     ''' INS_2_N : SVC NUMBER'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     else:
-        p[0] = [step2.operations_type2_n(p[1],p[2]),pc[p.lineno(1)-1]]
+        p[0] = [seg.get_segment().step2.operations_type2_n(p[1],p[2]),p.lineno(1)-1]
     pass
 
 ## numero que se encuentra entre el 1 y 16
@@ -535,7 +680,7 @@ def p_number(p):
     if parse.pasada == 1:    
         val = int(p[1])
         if not (val < 17 and val > 0):
-            insert_error(str(p.lineno(1)),"El numero debe ser ente 1 y 16")
+            seg.insert_error(str(p.lineno(1)),"El numero debe ser ente 1 y 16")
     else:
         p[0] = p[1]
     pass
@@ -548,9 +693,9 @@ def p_inst_2_reg_reg(p):
     | ARG_RR REGISTER DIR'''
     if parse.pasada == 2:
         if len(p)== 5:    
-            p[0] = [step2.operations_type_2(p[1],p[2],p[4]),pc[p.lineno(2)-1]]
+            p[0] = [seg.get_segment().step2.operations_type_2(p[1],p[2],p[4]),p.lineno(2)-1]
         else:
-            p[0] = [step2.operations_type_2(p[1],p[2],"X"),pc[p.lineno(2)-1]]
+            p[0] = [seg.get_segment().step2.operations_type_2(p[1],p[2],"X"),p.lineno(2)-1]
     pass
 
 ## instrucciones de tipo 2 que tiene como argumentos dos registros 
@@ -563,8 +708,8 @@ def p_op_arg_rr(p):
                | COMPR
                | ADDR'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     else:
         p[0] = p[1]
     pass
@@ -575,7 +720,7 @@ def p_op_arg_rr(p):
 def p_inst_2_reg_num(p):
     ''' INS_2_RN : ARG_R_N REGISTER COMMA NUMBER'''
     if parse.pasada == 2:
-        p[0] = [step2.operations_type_2_rn(p[1],p[2],p[4]),pc[p.lineno(2)-1]]
+        p[0] = [seg.get_segment().step2.operations_type_2_rn(p[1],p[2],p[4]),p.lineno(2)-1]
     pass
 
 ## instrucciones de tipo 2 que tiene como argumentos un registro y un numero 
@@ -584,8 +729,8 @@ def p_op_arg_rn(p):
     '''ARG_R_N : SHIFTL
                 | SHIFTR'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     else:
         p[0]=p[1]
     pass
@@ -597,11 +742,14 @@ def p_instruction_3_simple(p):
     if parse.pasada == 1:
         p[0]=3
     else:
-        if extencion == "s":
+        if extension == "s":
             p[0] = p[1]
         else:
             l = p[1]
-            code = step2.operation_type_3_4(l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[9])
+            if l[9] == "_":
+                seg.insert_error(str(p.lineno(1)),"las expreciones con valores externos no son validos en formato 3")
+                l[2] = "FFFFH"
+            code = seg.get_segment().step2.operation_type_3_4(l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[9])
             p[0]=[code,l[8]]
     pass
 
@@ -612,11 +760,14 @@ def p_instruction_3(p):
               | INMEDIATO'''
     p[0] = 3
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     else:
         l = p[1]
-        code = step2.operation_type_3_4(l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[9])
+        if l[9] == "_":
+            seg.insert_error(str(p.lineno(1)),"las expreciones con valores externos no son validos en formato 3")
+            l[2] = "FFFFH"
+        code = seg.get_segment().step2.operation_type_3_4(l[0],l[1],l[2],l[3],l[4],l[5],l[6],l[7],l[9])
         p[0]=[code,l[8]]
     pass
 
@@ -627,8 +778,8 @@ def p_instruccion_4(p):
             | PLUS INDIRECTO
             | PLUS INMEDIATO'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"formato valido solo  para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"formato valido solo  para la arquitectura XE")
         p[0]=4
     else:
         l = p[2]
@@ -636,8 +787,11 @@ def p_instruccion_4(p):
         b1 = parse.first_type == "CONSTANT" and len(parse.list_exp) == 1 and val<4095
         b2 = l[9] == "absoluto" and val<4095
         if b1 or b2:
-            insert_error(str(p.lineno(1)),"Formato 4 no valido")
-        code = step2.operation_type_3_4(l[0],l[1],l[2],4,l[4],l[5],l[6],l[7],l[9])
+            seg.insert_error(str(p.lineno(1)),"Formato 4 no valido")
+        code = seg.get_segment().step2.operation_type_3_4(l[0],l[1],l[2],4,l[4],l[5],l[6],l[7],l[9])
+        if not l[9] == "relativo":
+            for it in l[10]:
+                seg.get_segment().step2.list_op_m.append(it)
         p[0]=[code,l[8]]
     pass
 
@@ -646,10 +800,10 @@ def p_instruccion_4(p):
 def p_instruccion_codigo_RSUB(p):
     ''' CI : RSUB'''
     if parse.pasada==2:
-        if extencion =="s":
-            p[0]=["4C0000",pc[p.lineno(1)-1]]
+        if extension =="s":
+            p[0]=["4C0000",p.lineno(1)-1]
         else:
-            p[0]=["4F0000",pc[p.lineno(1)-1]]
+            p[0]=["4F0000",p.lineno(1)-1]
     else:    
         p[0]=3
     pass
@@ -672,7 +826,11 @@ def p_simple_m_etiqueta(p):
                 | OP_3_4 _EXP DIR'''
     if parse.pasada == 2:
       exp = p[2]
-      type_exp = check_is_valid_exp(parse.lineno,exp[1])
+      if p[2][1] == "_":
+           type_exp = "_"
+           is_c = False
+      else:
+          type_exp = check_is_valid_exp(parse.lineno,exp[1])
 #      c = (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) and type_exp == "absoluto"
       if type_exp == "relativo":
           is_c = False
@@ -681,54 +839,93 @@ def p_simple_m_etiqueta(p):
       index = len(p) == 4
       op = p[1]
       m = conv.exp_to_hexadecimal(exp[0])
-      if extencion == "s": 
-          string = step2.operations_code(op,m,index)
+      if extension == "s": 
+          string = seg.get_segment().step2.operations_code(op,m,index)
           p[0]=string
-          p[0]=[string,pc[parse.lineno-1]]
+          p[0]=[string,parse.lineno-1]
       else:
           is_index = len(p) == 4
-          cp = pc[parse.lineno]
+          line = parse.lineno - 1
+          blq_val = get_bloque_at(line)
+          cp = next_cp_bloque(line,blq_val)
+          #print cp,blq_val,line,op,parse.last_index,seg.index#,seg.get_segment().pc
+          cp = conv.to_decimal(cp)
+          cant_bloq =  seg.get_segment().bloques.get_load_dir_at(blq_val)
+          cp += conv.to_decimal(cant_bloq)
+          # print "caldosio",cant_bloq
+          cp = conv.decimal_to_hexadecimal(cp)
           format_type = 3
           num_line = parse.lineno
           dir_type ="Simple"
-          p[0] = [cp,op,m,format_type,num_line,dir_type,is_c,is_index,pc[parse.lineno-1],type_exp]
+          p[0] = [cp,op,m,format_type,num_line-parse.last_index,dir_type,is_c,is_index,parse.lineno-1,type_exp,p[2][2]]
     pass
 
 def p_indirecto_constante(p):
    '''INDIRECTO : OP_3_4 AT _EXP '''
    if parse.pasada == 2:
        exp = p[3]
-       type_exp = check_is_valid_exp(p.lineno(2),exp[1])
-       if (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) or type_exp == "relativo":
+       if p[3][1] == "_":
+           type_exp = "_"
            is_c = False
        else:
-           is_c = True
+           type_exp = check_is_valid_exp(p.lineno(2),exp[1])
+           if (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) and type_exp == "relativo":
+               is_c = False
+           else:
+               is_c = True
        m = conv.exp_to_hexadecimal(exp[0])
        op = p[1]
-       cp = pc[p.lineno(2)]
+       line = p.lineno(2) - 1
+       blq_val = get_bloque_at(p.lineno(2)-1)
+       cp = next_cp_bloque(line,blq_val)
+       cp = conv.to_decimal(cp) 
+       cp += conv.to_decimal(seg.get_segment().bloques.get_load_dir_at(blq_val))
+       cp = conv.decimal_to_hexadecimal(cp)
        format_type = 3
        num_line = p.lineno(2)
        dir_type ="Indirecto"
-       p[0] = [cp,op,m,format_type,num_line,dir_type,is_c,False,pc[p.lineno(2)-1],type_exp]
+       p[0] = [cp,op,m,format_type,num_line-parse.last_index,dir_type,is_c,False,p.lineno(2)-1,type_exp,p[3][2]]
    pass
     
 def p_inmediato_constante(p):
     '''INMEDIATO : OP_3_4 HASHTAG _EXP'''
     if parse.pasada == 2:
        exp = p[3]
-       type_exp = check_is_valid_exp(p.lineno(2),exp[1])
-       if (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) or type_exp == "relativo":
-           is_c = False
-       else:
+       if p[3][1] == "_":
+           type_exp = "_"
            is_c = True
+       else:
+           type_exp = check_is_valid_exp(p.lineno(2),exp[1])
+           if (parse.first_type == "ETIQUETA" and len(parse.list_exp) == 1) and type_exp == "relativo":
+               is_c = False
+           else:
+               is_c = True
        m = conv.exp_to_hexadecimal(exp[0])
+#       print m,is_c,type_exp,parse.list_exp
        op = p[1]
-       cp = pc[p.lineno(2)]
+       line = p.lineno(2) - 1
+       blq_val = get_bloque_at(p.lineno(2)-1)
+       cp = next_cp_bloque(line,blq_val)
+       cp = conv.to_decimal(cp) 
+       cp += conv.to_decimal(seg.get_segment().bloques.get_load_dir_at(blq_val))
+       cp = conv.decimal_to_hexadecimal(cp)
        format_type = 3
        num_line = p.lineno(2)
        dir_type ="Inmediato"
-       p[0] = [cp,op,m,format_type,num_line,dir_type,is_c,False,pc[p.lineno(2)-1],type_exp]
+       p[0] = [cp,op,m,format_type,num_line-parse.last_index,dir_type,is_c,False,p.lineno(2)-1,type_exp,p[3][2]]
     pass
+
+def next_cp_bloque(line,numb):
+    it = line + 1
+    #print it, len(seg.get_segment().num_bloque)
+    while it - parse.last_index < len(seg.get_segment().num_bloque):
+        blq_val = get_bloque_at(it)
+       # print numb,blq_val
+        if numb == blq_val:
+            return get_pc_at(it)
+        it += 1
+    return seg.get_segment().bloques.get_last_pc_at(numb)
+    
 
 def p_operation_3_4(p):
     ''' OP_3_4 : OP_S
@@ -782,8 +979,8 @@ def p_operation_XE(p):
               | SUBF
               | SSK'''
     if parse.pasada == 1:
-        if extencion == "s":
-            insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
+        if extension == "s":
+            seg.insert_error(str(p.lineno(1)),"instruccion solo valida para la arquitectura XE")
     p[0]=p[1]
 #==============================================================================
 #     Expresiones
@@ -818,16 +1015,20 @@ def p_expresion_plus(p):
     if parse.pasada == 2 or parse.evalua:
         type1 = p[1][1]
         type2 = p[3][1]
-        error = check_error(type1,type2)
-        if not error:
-            if type2 == type1:
-                type0 = "absoluto"
-            else:
-                type0 = "relativo"
-            res = p[1][0] + p[3][0]
-            p[0] = [res,type0]
+        list_r = p[1][2] + p[3][2]
+        res = p[1][0] + p[3][0]
+        if type1 == "_" or type2 == "_":
+            p[0] = [int(res),"_",list_r]
         else:
-            p[0]=[-1,"error"]
+            error = check_error(type1,type2)
+            if not error:
+                if type2 == type1:
+                    type0 = "absoluto"
+                else:
+                    type0 = "relativo"
+                p[0] = [res,type0,list_r]
+            else:
+                p[0]=[-1,"error",list_r]
     pass
 
 
@@ -838,21 +1039,26 @@ def p_expresion_minus(p):
     if parse.pasada == 2 or parse.evalua:
         type1 = p[1][1]
         type2 = p[3][1]
-        error = check_error(type1,type2)
-        if not error:
-            if type2 == type1:
-                type0 = "absoluto"
-            elif type1 == "relativo":
-                type0 = "relativo"
-            else:
-                error = True
+        list_r = p[1][2] + p[3][2]
+        res = p[1][0] - p[3][0]
+        if type1 == "_" or type2 == "_":
+            p[0] = [int(res),"_",list_r]
+        else:
+            error = check_error(type1,type2)
             if not error:
-                res = p[1][0] - p[3][0]
-                p[0] = [res,type0]                
-            else:
-                error = True
-        if error:
-            p[0] = [-1,"error"]
+                if type2 == type1:
+                    type0 = "absoluto"
+                elif type1 == "relativo":
+                    type0 = "relativo"
+                else:
+                    error = True
+                if not error:
+                    res = p[1][0] - p[3][0]
+                    p[0] = [res,type0,list_r]                
+                else:
+                    error = True
+            if error:
+                p[0] = [-1,"error",list_r]
     pass
 
 ##regla gramatica para la multiplicacion de dos expresiones
@@ -862,16 +1068,20 @@ def p_expresion_multi(p):
     if parse.pasada == 2 or parse.evalua:
         type1 = p[1][1]
         type2 = p[3][1]
-        error = check_error(type1,type2)
-        if not error:
-            if equal_type(type1,type2,"absoluto"):
-                res = p[1][0] * p[3][0]
-                p[0] = [int(res),"absoluto"]
-            else:
-                error = True
-        if error:
-            p[0] = [-1,"error"]
-    
+        list_r = p[1][2] + p[3][2]
+        res = p[1][0] * p[3][0]
+        if type1 == "_" or type2 == "_":
+            p[0] = [int(res),"_",list_r]
+        else:
+            error = check_error(type1,type2)
+            if not error:
+                if equal_type(type1,type2,"absoluto"):
+                    p[0] = [int(res),"absoluto",list_r]
+                else:
+                    error = True
+            if error:
+                p[0] = [-1,"error",list_r]
+        
     pass
 ##regla gramatica para la divicion de dos expresiones
 #@param p arreglo mapeado con los simbolos gramaticales de la regla 
@@ -879,22 +1089,26 @@ def p_expresion_div(p):
     '_T : _T DIVI _F '
     if parse.pasada == 2 or parse.evalua:
         error = False
+        list_r = p[1][2] + p[3][2]
         if p[3][0] == 0:
-            insert_error(p.lineno(2),"No se puede dividir un numero entre cero")
+            seg.insert_error(p.lineno(2),"No se puede dividir un numero entre cero")
             error = True
         else:
             type1 = p[1][1]
             type2 = p[3][1]
-            if not check_error(type1,type2):
-                if equal_type(type1,type2,"absoluto"):
-                    res = p[1][0] / p[3][0]
-                    p[0] = [int(res),"absoluto"]
+            res = p[1][0] / p[3][0]
+            if type1 == "_" or type2 == "_":
+                p[0] = [int(res),"_",list_r]
+            else:
+                if not check_error(type1,type2):
+                    if equal_type(type1,type2,"absoluto"):
+                        p[0] = [int(res),"absoluto",list_r]
+                    else:
+                        error = True
                 else:
                     error = True
-            else:
-                error = True
         if error:
-            p[0] = [-1,"error"]
+            p[0] = [-1,"error",list_r]
     pass
 
 def p_expresion_single(p):
@@ -911,7 +1125,7 @@ def p_f_constant(p):
             parse.first_type = "CONSTANT"
             parse.lineno = p.lineno(1)
         numeric_val = conv.to_decimal(p[1])
-        p[0] = [numeric_val,"absoluto"]
+        p[0] = [numeric_val,"absoluto",[]]
         check_sign(p,"absoluto")
     pass
 
@@ -921,21 +1135,44 @@ def p_f_etiqueta(p):
         if parse.first_type == "":
             parse.first_type = "ETIQUETA"
             parse.lineno = p.lineno(1)
-        symb = exist_symbol(p[1]) 
+        symb = seg.exist_symbol(p[1]) 
         if not symb:
             if parse.pasada == 2:
-                insert_warning(str(p.lineno(1)),"El simbolo no existe") 
+                seg.insert_warning(str(p.lineno(1)),"El simbolo no existe") 
             else:
-                insert_error(str(p.lineno(1)),"El simbolo no existe")
+                seg.insert_error(str(p.lineno(1)),"El simbolo no existe")
             val = conv.to_decimal("7FFFH")
-            p[0] = [val,"error"]
+            p[0] = [val,"error",[]]
             parse.lista_symb.append("error")
         else:
-            numeric_val = conv.to_decimal(symb.get_dir_val())
-            p[0] = [numeric_val,symb.get_sym_type()]
-            check_sign(p,symb.get_sym_type())                  
+            er = False
+            if parse.evalua:
+                blq_val = get_bloque_at(p.lineno(1)-1)
+                if not symb.num_bloque == blq_val:
+                    seg.insert_error(str(p.lineno(1)),"El simbolo no existe en el bloque actual")
+                    val = conv.to_decimal("7FFFH")
+                    p[0] = [val,"error",[]]
+                    er = True
+            if not er:
+                b = seg.get_segment().bloques.bloques[symb.num_bloque]
+                numeric_val = conv.to_decimal(symb.get_dir_val())
+                if symb.sym_type == "relativo" and extension == "x":
+                    numeric_val += conv.to_decimal(b.load_dir)
+                if symb.externo or symb.sym_type == "relativo":
+                    sign = ret_sign(p)
+                    p[0] = [numeric_val,symb.sym_type,[[symb.name,symb.sym_type,sign,get_pc_at(p.lineno(1)-1)]]]
+                else:
+                    p[0] = [numeric_val,symb.get_sym_type(),[]]
+                check_sign(p,symb.get_sym_type())                  
     pass
 
+def ret_sign(p):
+    sign = p[-1]    
+    if  not(sign == "-" or sign == "+"):
+        sign = "+"
+    sign = check_result_sign(sign)
+    return sign 
+    
 def check_sign(p,symb_type):
     sign = p[-1]            
     if  not(sign == "-" or sign == "+"):
@@ -979,8 +1216,8 @@ def check_is_valid_exp(lineno,type_result):
             dicc = num_relative(l)
             if dicc['+'] == 1:
                 return "relativo"
-    if not str(lineno) in warnings:
-        insert_error(str(lineno),"Expresion no valida")
+    if not str(lineno) in seg.get_segment().warnings:
+        seg.insert_error(str(lineno),"Expresion no valida")
     return "error"
     
 def list_all_absolute(l):
@@ -1043,12 +1280,12 @@ def p_error(t):
       else:
           token = get_token(t.value)
       if not token == "\n":
-          insert_error(line_error,"No se reconoce el token "+ token)
+          seg.insert_error(line_error,"P:No se reconoce el token "+ token+str(t))
       yacc.errok()
-      if len(pc)==0:
-          pc.append("0000H")
+      if len(seg.get_segment().pc)==0:
+          seg.get_segment().pc.append("0000H")
       else:
-          increment_PC(3)
+          seg.increment_PC(3)
       tok = yacc.token()
       return tok
   else:
@@ -1062,3 +1299,5 @@ parse.lista_symb=["+"]
 parse.list_exp =[]
 parse.first_type = ""
 parse.lineno = -1
+parse.last_index = 0
+parse.list_code = []

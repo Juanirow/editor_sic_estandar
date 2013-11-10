@@ -27,7 +27,11 @@ class Hexadecimal:
             return res
         else:
             return "error"
-            
+    ## resta dos numeros hexadecimales
+    # @param num1 valor numerico a restar 
+    # @param num2 valor numerico a restar 
+    # @return regresa la resta de dos numeros y si alguno de estos numeros no es 
+    # correcto regresa error        
     def subs(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -44,7 +48,11 @@ class Hexadecimal:
         else:
             res = convert.decimal_to_hexadecimal(res)
         return res
-        
+    ## resta dos numeros hexadecimales
+    # @param num1 valor numerico a restar 
+    # @param num2 valor numerico a restar 
+    # @return regresa la resta de dos numeros y si alguno de estos numeros no es 
+    # correcto regresa error    
     def subs_minus(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -74,7 +82,11 @@ class Hexadecimal:
             return num
         else:
             return num+"H"
-    
+
+    ## compara si un numero es menor a otro
+    # @param num1 valor numerico a comparar 
+    # @param num2 valor numerico a comparar 
+    # @return regresa un booleano
     def minus_than(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -83,7 +95,11 @@ class Hexadecimal:
         num2 = convert.to_decimal(num2)
         del convert
         return num1<num2
-        
+
+    ## regresa la operacion and entre 2 valores
+    # @param num1 valor numerico a comparar 
+    # @param num2 valor numerico a comparar 
+    # @return regresa un booleano    
     def and_op(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -94,7 +110,11 @@ class Hexadecimal:
         res = convert.decimal_to_hexadecimal(res)
         del convert
         return res
-        
+    
+    ## regresa la operacion or entre 2 valores
+    # @param num1 valor numerico a comparar 
+    # @param num2 valor numerico a comparar 
+    # @return regresa un booleano     
     def or_op(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -105,7 +125,11 @@ class Hexadecimal:
         res = convert.decimal_to_hexadecimal(res)
         del convert
         return res
-        
+    
+    ## compara dos numeros 
+    # @param num1 valor numerico a comparar 
+    # @param num2 valor numerico a comparar 
+    # @return regresa un booleano     
     def cmp_op(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -119,7 +143,11 @@ class Hexadecimal:
             ret = ">"
         del convert
         return ret
-        
+    ## divide dos numeros hexadecimales
+    # @param num1 valor numerico a dividir 
+    # @param num2 valor numerico a dividir 
+    # @return regresa la divide de dos numeros y si alguno de estos numeros no es 
+    # correcto regresa error    
     def div(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)
@@ -130,7 +158,11 @@ class Hexadecimal:
         res = convert.decimal_to_hexadecimal(res)
         del convert
         return res
-        
+    ## multiplica dos numeros hexadecimales
+    # @param num1 valor numerico a multiplicar 
+    # @param num2 valor numerico a multiplicar 
+    # @return regresa la multiplica de dos numeros y si alguno de estos numeros no es 
+    # correcto regresa error   
     def mul(self,num1,num2):
         convert = Convert()
         num1 = self.change_hexadecimal(num1)

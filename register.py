@@ -168,8 +168,7 @@ class Register:
             
     
     
-         
-#r = Register('T')
+
 #r.register= "1234567890"
 #r.init_dir="4242H"
 #print r.make_T()

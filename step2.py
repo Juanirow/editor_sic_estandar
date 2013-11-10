@@ -27,13 +27,20 @@ class Step2:
             'TIXR':'B8','WD':'DC'            
         }
         self.d = Displacement()
+        self.list_registers_h = []
         self.list_registers = []
+        self.list_registers_m = []
+        self.list_registers_r = []
+        self.list_registers_e = []
         self.current_register = Register("T")
         self.registers = {"A":"0","X":"1","L":"2","CP":"8","SW":"9","B":"3","S":"4","T":"5","F":"6"}
         self.base = "1038H"
         self.m_register = []
         self.m_modif_register = []
         self.h_name = ""
+        self.list_registers_d = []
+        self.list_word_m = []
+        self.list_op_m = []
     
     ## inserta una cadena de bytes en el registro T actual si no cabe genera 
     #otro registro nuevo para almacenar los datos
@@ -56,6 +63,82 @@ class Step2:
             register_t = self.current_register.make_T()
             self.list_registers.append(register_t)
             self.current_register = Register("T")
+    ## regresa el registro m de los elementos externos que se 
+    # encontraron en un codigo de expresion      
+    def get_m_register_op(self):
+        list_ret = []
+        hexa = Hexadecimal()
+        self.elimina_repetidos(self.list_op_m)
+        for it in self.list_op_m:
+            reg = "M"
+            val = hexa.plus(it[3],"1H")
+            reg += self.current_register.adjust_bytes(val,6,False)
+            reg += "05"
+            reg += it[2]
+            if it[1] == "_":
+                name = self.current_register.adjust_name(it[0])
+            else:
+                name = self.current_register.adjust_name(self.h_name)
+            reg += name
+            list_ret.append(reg)
+        return list_ret
+    ## elimina los registros m repetidos en una lista especificada 
+    # este metodo elimina los registros relativos con signo contrario y que se encuentran
+    #en la misma direccion 
+    def elimina_repetidos(self,list_r):
+        it = 0
+        re = 0
+        while it < len(list_r):
+            re = it + 1
+            eliminado = False
+            while re < len(list_r) and not eliminado:
+                if list_r[it][3] == list_r[re][3]:#direccion
+                    if not list_r[it][2] == list_r[re][2]:#signos
+                        if list_r[it][1] == "_" and list_r[re][1] == "_":
+                            if list_r[it][0] == list_r[re][0]:#nombre
+                                eliminado = True
+                        elif list_r[it][1] == "relativo" and list_r[re][1] == "relativo":
+                            eliminado = True
+                if not eliminado:
+                    re += 1
+            if eliminado:
+                list_r.remove(list_r[re])
+                list_r.remove(list_r[it])
+            else:
+                it += 1         
+                            
+    ## regresa el registro m de los elementos externos que se 
+    # encontraron en una directiva word  
+    def get_m_register_word(self):
+        list_ret = []
+        self.elimina_repetidos(self.list_word_m)
+        for it in self.list_word_m:
+            reg = "M"
+            reg += self.current_register.adjust_bytes(it[3],6,False)
+            reg += "06"
+            reg += it[2]
+            if it[1] == "_":
+                name = self.current_register.adjust_name(it[0])
+            else:
+                name = self.current_register.adjust_name(self.h_name)
+            reg += name
+            list_ret.append(reg)
+        return list_ret
+    ## rergesa una lista con todos los registros generados 
+    # desde el registro H hasta al E           
+    def all_registers(self):
+        ret = []
+        ret += self.list_registers_h
+        ret += self.list_registers_d
+        ret += self.list_registers_r
+        ret += self.list_registers
+        ret += self.list_registers_m
+        ret += self.get_m_register_op()
+        ret+= self.get_m_register_word()
+        ret += self.list_registers_e
+        # print self.list_op_m,self.list_word_m
+        return ret
+
 #==============================================================================
 #               Directiva START 
 #==============================================================================
@@ -65,9 +148,10 @@ class Step2:
     # @param inicial direccion de inicio del programa
     def directive_start(self,name,length,inicial):
         r = Register("H")
-        register_h = r.make_H(name,length,inicial)
-        self.list_registers.append(register_h)
-        self.h_name = r.adjust_name(name)
+        self.list_registers_h = []
+        register_h = r.make_H(name.upper(),length,inicial)
+        self.list_registers_h.append(register_h)
+        self.h_name = r.adjust_name(name.upper())
         del r
         
 #==============================================================================
@@ -77,27 +161,77 @@ class Step2:
     # @param direccion de la etiqueta de la primera instruccion a ejecutar o vacio
     def directive_end(self,label,dir_init):
         r = Register("E")
+        self.list_registers_e = []
         register_e = r.make_E(label,dir_init)
-        self.list_registers.append(register_e)
+        self.list_registers_e.append(register_e)
         del r
     
-    def make_register_m(self,obj_list,cp_list):
+    ## Crea el registro de final y lo inserta  en la lista de registros de un segmento
+    # @param direccion de la etiqueta de la primera instruccion a ejecutar o vacio
+    def directive_end_segment(self):
+        self.list_registers_e.append("E")
+    ## genera el registro para los simbolos externos que se usaran en
+    #el programa
+    def make_register_r(self,list_symb):
+        r = Register("X")
+        reg = "R"
+        for l in list_symb:
+            name = r.adjust_name(l)
+            reg+=name
+        self.list_registers_r.append(reg)
+        
+    ## crea los registros de definicion de el segmento
+    #si el registro sobre pasa el tamaño de 73 caracteres crea otro registro 
+    def make_register_d(self,list_sym,tab_sym):
+        r =Register("X")
+        reg = "D"
+        for it in list_sym:
+            if len(reg) + 12 > 73:
+                self.list_registers_d.append(reg)
+                reg = "D"
+            item = self.exist_item(it,tab_sym)
+            name = r.adjust_name(it)
+            if item:
+                dir = r.adjust_bytes(item.get_dir_val(),6,False)
+            else:
+                dir = "FFFFFF"
+            reg+= (name+dir)
+        if not len(reg) == 1:
+            self.list_registers_d.append(reg)
+
+    ## checa si existe un item con un valor de name igual a el parametro name       
+    def exist_item(self ,name,symbols):
+        for it in symbols:
+            if it.get_name() == name:
+                return it
+        return None
+        
+    ## genera los registros de m modificados apartir de la lista de registros
+    def make_register_m(self,obj_list,cp_list,num_bloque,bloques):
         r = Register("M")
+        hx = Hexadecimal()
         r.name = self.h_name
         it = 0 
         while it < len(self.m_register):
             index = self.m_register[it]
-            register = r.make_M(obj_list[index-1],cp_list[index-1])
-            self.list_registers.append(register)
+            # print "normal",index
+            load_dir = bloques.get_load_dir_at(num_bloque[index-1])
+            cp = hx.plus(cp_list[index-1],load_dir)
+            register = r.make_M(obj_list[index-1],cp)
+            self.list_registers_m.append(register)
             it += 1
         it = 0
         while it < len(self.m_modif_register):
             index = self.m_modif_register[it]
-            register = r.make_M_modificado(obj_list[index-1],cp_list[index-1])
-            self.list_registers.append(register)
+            # print "modifi",index,len(cp_list)
+            load_dir = bloques.get_load_dir_at(num_bloque[index-1])
+            cp = hx.plus(cp_list[index-1],load_dir)
+            register = r.make_M_modificado(obj_list[index-1],cp)
+            self.list_registers_m.append(register)
             it += 1
     
-    
+    ## genera el registro de modificacion de una directiva word
+    #y lo regresa en forma de cadena 
     def directive_word(self,value):
         c = Convert()
         if not c.is_hexadecimal(value):
@@ -250,6 +384,8 @@ class Step2:
             return True
         return False
     
+    ## calcula las banderas de n, i para los casos de simple
+    #indirecto e Inmediato
     def get_flags(self,type):
         flags = {'n':0,'i':0,'x':0,'b':0,'p':0,'e':0}
         n = 1
@@ -264,7 +400,9 @@ class Step2:
         flags['i'] = i 
         return flags
     
-    
+    ## checa si un elemento es relativo a la base si no es asi
+    # validadndo que el resultado este entre los valores de m  
+    # regresa un valor de None
     def is_relative_cp(self,cp,arg):
         hex = Hexadecimal()
         c = Convert()        
@@ -279,7 +417,9 @@ class Step2:
             return c.exp_to_hexadecimal(res)
         else: 
             return None
-        
+    
+    ## checa si un elemento es relativo a la base si no es asi 
+    # regresa un valor de None
     def relative_base(self,arg):
         hex = Hexadecimal()
         c = Convert()        
@@ -289,6 +429,7 @@ class Step2:
             return res
         return None
     
+    ## este metodo calcula el codigo objeto de una instruccion 
     def operation_type_3_4(self,cp,operator,arg,format_type,num_line,dir_type,type_c,is_index,valid_label):
         c = Convert()
         operator = self.get_binary_code(operator)
@@ -328,6 +469,9 @@ class Step2:
         if not valid_label:
             flags['b'] = 1
             flags['p'] = 1
+        if valid_label == "_":
+            flags['b'] = 0
+            flags['p'] = 0
         flags = self.flags_string(flags)
         val = operator + flags
         val = str(int(val,2))
@@ -338,19 +482,16 @@ class Step2:
         val += str(res)
         del c
         return val
-        
+     
+    ##  regresa una cadena de bites que es la representacion de las banderas 
+    # utilizadas para generar el codigo objeto de las operaciones de formato 
+    # 3 y 4
     def flags_string(self,dicc):
         string = ""
         string += str(dicc['n'])+str(dicc['i'])
         string += str(dicc['x'])+str(dicc['b'])
         string += str(dicc['p'])+str(dicc['e'])
         return string
-
-        
-#st = Step2()
-#st.operation_type_indirecto("0004H","LDT","103BH",3,2)
-#print st.m_register
-
                 
             
         

@@ -198,7 +198,12 @@ class Convert:
             val = "0H"
         else:
             val = self.decimal_to_hexadecimal(val)
+            if val[0] == "F" and len(val) == 2:
+                val = "0"+val
         return val
+    
+#c = Convert()
+#print c.exp_to_hexadecimal(14)
         
 
                

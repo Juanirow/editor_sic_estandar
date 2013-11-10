@@ -21,7 +21,7 @@ keyword = (
       'CLEAR','COMPF','COMPR','DIVF','DIVR','FLOAT',
       'BASE','HIO','LDB','LDF','LPS','LDS','LDT','MULF','MULR',
       'NORM','RMO','SHIFTL','SHIFTR','SIO','SSK','STB','STF',
-      'STI','STT','STS','SUBF','SUBR','SVC','TIO','TIXR','FIX','EQU','ORG')
+      'STI','STT','STS','SUBF','SUBR','SVC','TIO','TIXR','FIX','EQU','ORG','USE','EXTREF','EXTDEF','CSECT')
 
 ## declaracion de los tokens
 tokens = keyword + (
@@ -33,6 +33,13 @@ tokens = keyword + (
 registers = ('A','X','L','CP','SW','B','S','T','F')
 
 
+
+##metodo que empareja con el token CSECT
+# @param t instancia del token de leX
+# @return instancia del token que emparejo
+#def t_CSECT(t):
+#    r'CSECT'
+#    return t
 ##metodo que empareja con el caracter de asignacion
 # @param t instancia del token de leX
 # @return instancia del token que emparejo
@@ -143,7 +150,7 @@ def t_DECIMAL(t):
 ##metodo para aumentar la linea de codigo cuando se encuentra un salto de linea
 # @param t instancia del token de leX
 def t__SALTO(t):
-    r'\n+'
+    r'[\n]+'
     t.lexer.lineno += len(t.value)
     return t
     
@@ -177,6 +184,7 @@ def t_error(valor):
 
 scann = lex.lex()
 scann.errors = {}
+scann.linea = 0
 ##imprime en terminal la lista de token que produce al analizar una cadena
 #@texto texto a analizar 
 def entrada(texto):

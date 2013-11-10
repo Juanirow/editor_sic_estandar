@@ -1,8 +1,8 @@
 EJECUTABLE=python main.py
 clean:
 	@rm -rf *.pyc
-	@rm -rf *.o{x,s} *.t{x,s}
+	@rm -rf *.o[x,s] *.t[x,s]
 	@rm -rf parsetab.py
-	@rm -rf *.out
+	@rm -rf *.out && clear
 run:
 	$(EJECUTABLE)

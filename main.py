@@ -23,6 +23,8 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox_obj = None
         self.cargador = None
         self.fc = None
+        self.tab_t = None
+        # self.show_tab_t_file()
         QtCore.QObject.connect(self.window.actionAbrir, QtCore.SIGNAL("triggered()"), self.open_file)
         QtCore.QObject.connect(self.window.actionNuevo, QtCore.SIGNAL("triggered()"), self.create_file)
         QtCore.QObject.connect(self.window.actionGuardar, QtCore.SIGNAL("triggered()"), self.save_file)
@@ -66,9 +68,8 @@ class Window_Form(QtGui.QMainWindow):
         if self.textbox:
             self.textbox.close()
         self.textbox = QtGui.QTextEdit(self)
-        self.textbox.setGeometry(0,35,395,630)
+        self.textbox.setGeometry(0,60,395,600)
         self.textbox.setText(text)
-#        self.textbox.setFont(QtGui.QFont ("Courier", 9))
         self.textbox.show()
     
     def create_file(self):
@@ -107,6 +108,7 @@ class Window_Form(QtGui.QMainWindow):
     def compile(self):
         self.save_file()
         self.set_statusBar_Text("Compilando")
+        self.delete_salidas_file()
         if self.is_file_open():
             self.fc = File()
             if self.fc.is_extension_valid(self.file,'s') or self.fc.is_extension_valid(self.file,'x') :
@@ -139,6 +141,26 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox_errors.setText(errors)
 #        self.textbox_errors.setFont(QtGui.QFont ("Courier", 9))
         self.textbox_errors.show()
+
+    def show_tab_t_file(self):
+        if self.tab_t:
+            self.tab_t.close()
+        self.tab_t = QtGui.QTabWidget(self)
+        self.tab_t.setGeometry(400,60,800,325)
+        tab_bar = QtGui.QTabBar(self.tab_t)
+        tab = QtGui.QWidget()
+        text_e = QtGui.QTextEdit(tab)
+        text_e.setGeometry(40,40,40,40)
+        self.tab_t.addTab(tab,"Main")
+        tab = QtGui.QWidget()
+        text_e = QtGui.QTextEdit(tab)
+        text_e.setGeometry(60,60,40,40)
+        self.tab_t.addTab(tab,"Main2")
+              
+    def delete_salidas_file(self):
+        ficheros = os.listdir("./salidas")
+        for s in ficheros:
+            os.remove(s)
 
     def show_textBox_obj(self,text):
         if self.textbox_obj:

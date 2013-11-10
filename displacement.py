@@ -48,3 +48,13 @@ class Displacement:
         if cant % 2 == 0:
             return cant
         return cant+1
+    
+    ## regresa una cadena que representa un texto mas una serie de espacios
+    # la cual es del tamaño del parametro tam menos la longitud de la cadena    
+    def get_tex_space(self,texto,tam):
+        texto = str(texto)
+        tam_real = tam - len(texto)
+        string = " "
+        string = string*tam_real
+        string = texto+string
+        return string
