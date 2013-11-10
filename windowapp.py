@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_windowApp(object):
     def setupUi(self, windowApp):
         windowApp.setObjectName(_fromUtf8("windowApp"))
-        windowApp.resize(1000, 700)
+        windowApp.resize(1300, 700)
         self.centralWidget = QtGui.QWidget(windowApp)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
         windowApp.setCentralWidget(self.centralWidget)

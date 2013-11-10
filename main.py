@@ -24,7 +24,8 @@ class Window_Form(QtGui.QMainWindow):
         self.cargador = None
         self.fc = None
         self.tab_t = None
-        # self.show_tab_t_file()
+        self.tab_o = None 
+        # self.create_tabs()
         QtCore.QObject.connect(self.window.actionAbrir, QtCore.SIGNAL("triggered()"), self.open_file)
         QtCore.QObject.connect(self.window.actionNuevo, QtCore.SIGNAL("triggered()"), self.create_file)
         QtCore.QObject.connect(self.window.actionGuardar, QtCore.SIGNAL("triggered()"), self.save_file)
@@ -68,7 +69,7 @@ class Window_Form(QtGui.QMainWindow):
         if self.textbox:
             self.textbox.close()
         self.textbox = QtGui.QTextEdit(self)
-        self.textbox.setGeometry(0,60,395,600)
+        self.textbox.setGeometry(0,65,600,600)
         self.textbox.setText(text)
         self.textbox.show()
     
@@ -117,16 +118,17 @@ class Window_Form(QtGui.QMainWindow):
                 self.set_statusBar_Text("Compilando") 
                 os.system("python principal.py "+str(self.file))
                 self.set_statusBar_Text("Cargando archivo intermedio "+self.file_name)
-                file_error = open(self.file_name+".t"+self.fc.extension)
-                text_errors = file_error.read()
-                self.show_textBox_errors(text_errors)
-                name_file = self.file_name+".o"+self.fc.extension
-                self.set_statusBar_Text("Cargando archivo objeto "+name_file)
-                if os.path.isfile(name_file):
-                    file_obj = open(name_file)
-                    obj_text = file_obj.read()
-                    self.show_textBox_obj(obj_text)
-                self.set_statusBar_Text("Se termino el ensablado de "+name_file)
+                self.load_output_files()
+                # file_error = open(self.file_name+".t"+self.fc.extension)
+                # text_errors = file_error.read()
+                # self.show_textBox_errors(text_errors)
+                # name_file = self.file_name+".o"+self.fc.extension
+                # self.set_statusBar_Text("Cargando archivo objeto "+name_file)
+                # if os.path.isfile(name_file):
+                #     file_obj = open(name_file)
+                #     obj_text = file_obj.read()
+                #     self.show_textBox_obj(obj_text)
+                self.set_statusBar_Text("Se termino el ensablado de "+self.file_name)
             else:
                 self.set_statusBar_Text("No se puede compilar el archivo no es un .s o .x")
         else: 
@@ -156,11 +158,51 @@ class Window_Form(QtGui.QMainWindow):
         text_e = QtGui.QTextEdit(tab)
         text_e.setGeometry(60,60,40,40)
         self.tab_t.addTab(tab,"Main2")
-              
+
+    def create_tabs(self):
+        if self.tab_t:
+            self.tab_t.close()
+        self.tab_t = QtGui.QTabWidget(self)
+        self.tab_t.setGeometry(610,65,680,320)
+        if self.tab_o:
+            self.tab_o.close()
+        self.tab_o = QtGui.QTabWidget(self)
+        self.tab_o.setGeometry(610,390,680,320)
+        self.tab_o.show()
+        self.tab_t.show()
+
+    def load_output_files(self):
+        self.create_tabs()
+        ficheros = os.listdir("./salidas")
+        for s in ficheros:
+            info = self.get_file_info(s)
+            tab = QtGui.QWidget()
+            text_e = QtGui.QTextEdit(tab)
+            text_e.setText(info[2])
+            text_e.setGeometry(10,10,650,310)
+            extension = info[1]
+            print extension
+            if extension[0] == "t":
+                self.tab_t.addTab(tab,info[0])
+            else:
+                self.tab_o.addTab(tab,info[0]) 
+
+    def get_file_info(self,fichero):
+        list_name = fichero.split(".")
+        extension = list_name[-1]
+        name = list_name[0]
+        f = open(fichero)
+        text = f.read()
+        return [name,extension,text]
+
+
+
+
+
     def delete_salidas_file(self):
         ficheros = os.listdir("./salidas")
         for s in ficheros:
-            os.remove(s)
+             os.remove("./salidas/"+s)
 
     def show_textBox_obj(self,text):
         if self.textbox_obj:
