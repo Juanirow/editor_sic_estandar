@@ -13,13 +13,35 @@ class Objcargador(QtGui.QDockWidget):
         self.window = Ui_DockWidget()
         self.window.setupUi(self)
         self.window.pushButton.clicked.connect(self.abrir)
+        self.window.btn_subir.clicked.connect(self.up)
+        self.window.btn_abajo.clicked.connect(self.down)
+        self.window.btn_eliminar.clicked.connect(self.delete)
 
     def abrir(self):
     	fname = QtGui.QFileDialog.getOpenFileNames(self, 'Abrir Archivo', 
                 '/home/Desktop/Progra/EditorSIC/ejemplos', "Files (*.os)")
-    	string = self.window.textEdit.toPlainText()
-    	list_str = string.split("\n")
     	for s in fname:
-    		if not s in list_str:
-    			string += s + "\n"
-		self.window.textEdit.setText(string)
+    		self.window.listWidget.addItem(s)
+
+    def up(self):
+        item = self.window.listWidget.currentItem()
+        if item:
+            item_row = self.window.listWidget.currentRow()
+            item2 = self.window.listWidget.takeItem(item_row)
+            item2 = None
+            self.window.listWidget.insertItem(item_row-1,item)
+
+    def down(self):
+        item = self.window.listWidget.currentItem()
+        if item:
+            item_row = self.window.listWidget.currentRow()
+            item2 = self.window.listWidget.takeItem(item_row)
+            item2 = None
+            self.window.listWidget.insertItem(item_row+1,item)
+
+    def delete(self):
+        item = self.window.listWidget.currentItem()
+        if item:
+            item_row = self.window.listWidget.currentRow()
+            item2 = self.window.listWidget.takeItem(item_row)
+            item2 = None

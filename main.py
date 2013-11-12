@@ -3,6 +3,8 @@ import sys
 from PyQt4 import QtCore, QtGui
 from my_file import File 
 from Cargador import Cargador
+from Cargadorx import Cargadorx
+from objcargador import Objcargador
 import os
 
 
@@ -24,7 +26,8 @@ class Window_Form(QtGui.QMainWindow):
         self.cargador = None
         self.fc = None
         self.tab_t = None
-        self.tab_o = None 
+        self.tab_o = None
+        self.cargadorx = None 
         # self.create_tabs()
         QtCore.QObject.connect(self.window.actionAbrir, QtCore.SIGNAL("triggered()"), self.open_file)
         QtCore.QObject.connect(self.window.actionNuevo, QtCore.SIGNAL("triggered()"), self.create_file)
@@ -33,6 +36,11 @@ class Window_Form(QtGui.QMainWindow):
         QtCore.QObject.connect(self.window.actionCerrar, QtCore.SIGNAL("triggered()"), self.close_file)
         QtCore.QObject.connect(self.window.actionEnsamblar, QtCore.SIGNAL("triggered()"), self.compile)
         QtCore.QObject.connect(self.window.actionCargar, QtCore.SIGNAL("triggered()"), self.cargar)
+        QtCore.QObject.connect(self.window.actionLigar, QtCore.SIGNAL("triggered()"), self.ligar)
+
+    def ligar(self):
+        self.cargadorx = Objcargador()
+        self.cargadorx.show()
 
     def cargar(self):
         if self.is_file_open():
@@ -119,21 +127,11 @@ class Window_Form(QtGui.QMainWindow):
                 os.system("python principal.py "+str(self.file))
                 self.set_statusBar_Text("Cargando archivo intermedio "+self.file_name)
                 self.load_output_files()
-                # file_error = open(self.file_name+".t"+self.fc.extension)
-                # text_errors = file_error.read()
-                # self.show_textBox_errors(text_errors)
-                # name_file = self.file_name+".o"+self.fc.extension
-                # self.set_statusBar_Text("Cargando archivo objeto "+name_file)
-                # if os.path.isfile(name_file):
-                #     file_obj = open(name_file)
-                #     obj_text = file_obj.read()
-                #     self.show_textBox_obj(obj_text)
                 self.set_statusBar_Text("Se termino el ensablado de "+self.file_name)
             else:
                 self.set_statusBar_Text("No se puede compilar el archivo no es un .s o .x")
         else: 
             self.set_statusBar_Text("No hay un archivo por compilar")
-
 
     def show_textBox_errors(self,errors):
         if self.textbox_errors:
@@ -141,23 +139,7 @@ class Window_Form(QtGui.QMainWindow):
         self.textbox_errors = QtGui.QTextEdit(self)
         self.textbox_errors.setGeometry(400,35,800,350)
         self.textbox_errors.setText(errors)
-#        self.textbox_errors.setFont(QtGui.QFont ("Courier", 9))
         self.textbox_errors.show()
-
-    def show_tab_t_file(self):
-        if self.tab_t:
-            self.tab_t.close()
-        self.tab_t = QtGui.QTabWidget(self)
-        self.tab_t.setGeometry(400,60,800,325)
-        tab_bar = QtGui.QTabBar(self.tab_t)
-        tab = QtGui.QWidget()
-        text_e = QtGui.QTextEdit(tab)
-        text_e.setGeometry(40,40,40,40)
-        self.tab_t.addTab(tab,"Main")
-        tab = QtGui.QWidget()
-        text_e = QtGui.QTextEdit(tab)
-        text_e.setGeometry(60,60,40,40)
-        self.tab_t.addTab(tab,"Main2")
 
     def create_tabs(self):
         if self.tab_t:
@@ -195,23 +177,10 @@ class Window_Form(QtGui.QMainWindow):
         text = f.read()
         return [name,extension,text]
 
-
-
-
-
     def delete_salidas_file(self):
         ficheros = os.listdir("./salidas")
         for s in ficheros:
              os.remove("./salidas/"+s)
-
-    def show_textBox_obj(self,text):
-        if self.textbox_obj:
-            self.textbox_obj.close()
-        self.textbox_obj = QtGui.QTextEdit(self)
-        self.textbox_obj.setGeometry(400,480,800,510)
-        self.textbox_obj.setText(text)
-#        self.textbox_obj.setFont(QtGui.QFont ("Courier", 14))
-        self.textbox_obj.show()
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

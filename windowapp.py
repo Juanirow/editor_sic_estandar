@@ -67,6 +67,13 @@ class Ui_windowApp(object):
         icon5.addPixmap(QtGui.QPixmap(_fromUtf8("./images/cargar.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionCargar.setIcon(icon5)
         self.actionCargar.setObjectName(_fromUtf8("actionCargar"))
+
+        self.actionLigar = QtGui.QAction(windowApp)
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(_fromUtf8("./images/cargar.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionLigar.setIcon(icon6)
+        self.actionLigar.setObjectName(_fromUtf8("actionLigar"))
+
         self.menuArchivo.addSeparator()
         self.menuArchivo.addAction(self.actionNuevo)
         self.menuArchivo.addSeparator()
@@ -87,6 +94,7 @@ class Ui_windowApp(object):
         self.mainToolBar.addSeparator()
         self.mainToolBar.addAction(self.actionEnsamblar)
         self.mainToolBar.addAction(self.actionCargar)
+        self.mainToolBar.addAction(self.actionLigar)
 
         self.retranslateUi(windowApp)
         QtCore.QMetaObject.connectSlotsByName(windowApp)
@@ -103,4 +111,5 @@ class Ui_windowApp(object):
         self.actionEnsamblar.setText(QtGui.QApplication.translate("windowApp", "Ensamblar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionEnsamblar.setToolTip(QtGui.QApplication.translate("windowApp", "Ensamblar", None, QtGui.QApplication.UnicodeUTF8))
         self.actionCargar.setText(QtGui.QApplication.translate("windowApp", "Cargar", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionLigar.setText(QtGui.QApplication.translate("windowApp", "Ligar", None, QtGui.QApplication.UnicodeUTF8))
 
