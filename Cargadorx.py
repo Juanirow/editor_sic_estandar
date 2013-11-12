@@ -13,16 +13,16 @@ class Cargadorx(QtGui.QDockWidget):
         QtGui.QWidget.__init__(self)
         self.window = Ui_DockWidget()
         self.window.setupUi(self)
-        self.file_name = None
-        self.init = None
-        self.header = None
-        self.registers = None
-        self.end = None
-        self.rows_count = None
-        self.end_program = None
-        self.cc = "="
-        self.hex = Hexadecimal()
-        self.reg = Register("T")
+        # self.file_name = None
+        # self.init = None
+        # self.header = None
+        # self.registers = None
+        # self.end = None
+        # self.rows_count = None
+        # self.end_program = None
+        # self.cc = "="
+        # self.hex = Hexadecimal()
+        # self.reg = Register("T")
         # self.window.btnSimular.clicked.connect(self.simular)
         # self.operations = {"18":self.add,"00":self.lda,"40":self.andop,
         #                    "28":self.cmp_op,"24":self.div,"3C":self.j_op,
@@ -31,14 +31,15 @@ class Cargadorx(QtGui.QDockWidget):
         #                    "04":self.ldx,"20":self.mul,"4C":self.rsub,
         #                    "0C":self.sta,"54":self.stch,"14":self.stl,
         #                    "E8":self.stsw,"10":self.stx,"1C":self.sub,"2C":self.tix}
-        self.operations_text = {"18":"ADD","00":"LDA","40":"AND",
-                           "28":"COMP","24":"DIV","3C":"J",
-                           "30":"JEQ","34":"JGT","38":"JLT",
-                           "48":"JSUB","50":"LDCH","08":"LDL",
-                           "04":"LDX","20":"MUL","4C":"RSUB",
-                           "0C":"STA","54":"STCH","14":"STL",
-                           "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX"}
-        
+        # self.operations_text = {"18":"ADD","00":"LDA","40":"AND",
+        #                    "28":"COMP","24":"DIV","3C":"J",
+        #                    "30":"JEQ","34":"JGT","38":"JLT",
+        #                    "48":"JSUB","50":"LDCH","08":"LDL",
+        #                    "04":"LDX","20":"MUL","4C":"RSUB",
+        #                    "0C":"STA","54":"STCH","14":"STL",
+        #                    "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX"}
+
+     
         
     # def simular(self):
     #     num_actions = self.get_count_next_actions()

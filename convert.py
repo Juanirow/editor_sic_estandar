@@ -79,7 +79,6 @@ class Convert:
             return self.string_decimal(value,value_pow)
         else:
             return int(value)
-        
 
 
     ## Checa si una cadena representa un numero hexadecimal 
