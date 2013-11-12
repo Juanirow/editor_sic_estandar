@@ -61,7 +61,7 @@ class Objcargador(QtGui.QDockWidget):
                 res = res.group()
                 if res == text:
                     list_obj = self.get_list_obj()
-                    self.cargador = Cargador()
+                    self.cargador = Cargadorx()
                     elf.cargador.show()
                     self.cargador.load_file_name(list_obj)
 

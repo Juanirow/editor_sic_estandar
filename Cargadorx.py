@@ -40,7 +40,8 @@ class Cargadorx(QtGui.QDockWidget):
         #                    "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX"}
 
      
-        
+    def load_file_name(self,list_obj):
+            
     # def simular(self):
     #     num_actions = self.get_count_next_actions()
     #     if num_actions == -1:
