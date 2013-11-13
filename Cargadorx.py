@@ -115,10 +115,29 @@ class Cargadorx(QtGui.QDockWidget):
                     self.charge_obj_code(n)
                 elif n[0] == "M":
                     self.change_m_register(n)
-            self.dirsc = self.hexa.plus(self.dirsc+self.lonsc) 
+            self.dirsc = self.hexa.plus(self.dirsc,self.lonsc) 
 
-    def charge_obj_code(self,n):
-        print "M"
+    def charge_obj_code(self,r):
+        string = r[9:]
+        index = 0
+        print r
+        init = r[1:7]
+        init = self.hexa.plus(init+"H",self.dirsc)[:-1]
+        print init
+        col_start = init[-1]+"H"
+        col = int(self.convert.to_decimal(col_start)  + 1) 
+        res = self.hexa.subs(init[:-1],self.dirprog[:-2])
+        dec_res = int(self.convert.to_decimal(res))
+        while index < len(string):
+            print col,dec_res
+            byte = string[index:index+2]
+            item = QtGui.QTableWidgetItem(byte)
+            self.window.tableWidget.setItem(dec_res,col,item)
+            index+=2
+            col = (col + 1) % 17
+            if col == 0:
+                col = 1
+                dec_res += 1
 
     def change_m_register(self,n):
         print "m"
