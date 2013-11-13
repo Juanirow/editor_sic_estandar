@@ -3,6 +3,7 @@ from windowcargador import Ui_DockWidget
 from hexadecimal import Hexadecimal
 from convert import Convert
 from register import Register
+from tabse import Tabse
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -13,6 +14,13 @@ class Cargadorx(QtGui.QDockWidget):
         QtGui.QWidget.__init__(self)
         self.window = Ui_DockWidget()
         self.window.setupUi(self)
+        self.tabse = Tabse()
+        self.lonsc = "0H"
+        self.dirsc = "0H"
+        self.dirprog = "0H"
+        self.direj = "0H"
+        self.hexa = Hexadecimal()
+        self.convert = Convert()
         # self.file_name = None
         # self.init = None
         # self.header = None
@@ -40,8 +48,87 @@ class Cargadorx(QtGui.QDockWidget):
         #                    "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX"}
 
      
-    def load_file_name(self,list_obj):
-         print "Hola"   
+    def load_file_name(self,list_obj,dirprog):
+        val_int = self.convert.to_decimal(dirprog)
+        self.dirprog = self.convert.decimal_to_hexadecimal(val_int)
+        self.dirsc = self.dirprog
+        self.step_1(list_obj)
+        self.dirsc = self.dirprog
+        self.direj = self.dirprog
+
+
+    def step_1(self,list_obj):
+        band_error = False
+        for list_n in list_obj:
+            for n in list_n:
+                if n[0] == "H":
+                    ret = self.step_h(n,1)
+                elif n[0] == "D":
+                    ret = self.step_1_d(n)
+                if not band_error and ret:
+                    band_error = ret
+            self.dirsc = self.hexa.plus(self.dirsc+self.lonsc)
+        return band_error    
+
+    def step_h(self,n,step):
+        band_error = False
+        name = n[1:7]
+        name = name.strip()
+        self.lonsc = n[13:]+"H"
+        if step == 1:
+            if not self.tabse.exist_node(name):
+                self.tabse.insert_section(name,self.dirsc,self.lonsc)
+            else:
+                band_error = True
+        return band_error
+
+    def step_1_d(self,n):
+        band_error = False
+        num = len(n)-1/12
+        it = 0
+        while it < num:
+            index1 = (it * 12)+1
+            index2 = index1 + 6
+            index3 = index2 + 6
+            name = n[index1:index2].strip()
+            if index3 >= len(n):
+                len_r = n[index2:]+"H"
+            else:
+                len_r = n[index2:index3]+"H"
+            if not self.tabse.exist_node(name):
+                val = self.hexa.plus(len_r,self.dirsc)
+                self.tabse.insert_variable(name,val)
+            else:
+                band_error = True
+            it += 1
+        return band_error
+
+    def step_2(self,list_obj):
+        band_error = False
+        for list_n in list_obj:
+            for n in list_n:
+                if n[0] == "H":
+                    self.step_h(n,2)
+                elif n[0] == "T":
+                    self.charge_obj_code(n)
+                elif n[0] == "M":
+                    self.change_m_register(n)
+            self.dirsc = self.hexa.plus(self.dirsc+self.lonsc) 
+
+    def charge_obj_code(self,n):
+        print "t"
+
+    def change_m_register(self,n):
+        print "m"
+
+
+
+
+
+
+
+
+
     # def simular(self):
     #     num_actions = self.get_count_next_actions()
     #     if num_actions == -1:

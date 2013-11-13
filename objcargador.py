@@ -23,7 +23,7 @@ class Objcargador(QtGui.QDockWidget):
 
     def abrir(self):
     	fname = QtGui.QFileDialog.getOpenFileNames(self, 'Abrir Archivo', 
-                '/home/Desktop/Progra/EditorSIC/ejemplos', "Files (*.os)")
+                '/home/Desktop/Progra/EditorSIC/ejemplos', "Files (*.ox)")
     	for s in fname:
     		self.window.listWidget.addItem(s)
 
@@ -55,15 +55,26 @@ class Objcargador(QtGui.QDockWidget):
     def cargar_ligar(self):
         text = str(self.window.lineEdit.text())
         if not text.strip() == "":
-            regex = re.compile("[0-9A-F]+[H]?")
+            regex = re.compile("[0-9A-F]+H")
             res = regex.search(text)
             if res:
                 res = res.group()
                 if res == text:
                     list_obj = self.get_list_obj()
                     self.cargador = Cargadorx()
-                    elf.cargador.show()
-                    self.cargador.load_file_name(list_obj)
+                    self.cargador.show()
+                    list_obj = self.get_list_of_list(list_obj)
+                    self.cargador.load_file_name(list_obj,text)
+
+    ## rergesa una lista que contiene una lista de registros
+    # que contiene cada archivo en la lista de parametro 
+    def get_list_of_list(self,list_obj):
+        list_ret = []
+        for s in list_obj:
+            f = opens
+            obj = f.read()
+            list_ret.append(obj.split("\n")[:-1])
+        return list_ret
 
     def get_list_obj(self):
         count = self.window.listWidget.count()

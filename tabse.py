@@ -1,5 +1,5 @@
 
-class nodot():
+class Nodot():
 	## Constructor de la clase nodoT que representa un registro en 
 	# la tabla de TABSE
 	# @param name nombre de la variable o seccion de control (string) 
@@ -44,7 +44,7 @@ class nodot():
 	def set_len(self,val):
 		self.len = val
 
-class tabse():
+class Tabse():
 	## constructor de la clase tabse que representa la tabla 
 	# de secciones 
 	def __init__(self):
@@ -61,15 +61,15 @@ class tabse():
 	# regresa True si la pudo insertar 
 	def insert_variable(self,name,dirc):
 		if not self.exist_node(name):
-			self.list_n.appen(nodot(name,dirc))
+			self.list_n.appen(Nodot(name,dirc))
 			return True
 		return False
 
 	## inserta una seccion a la tabla si esque esta no esta definida
 	# regresa True si la pudo insertar 
-	def insert_secction(self,name,dirc,leng):
+	def insert_section(self,name,dirc,leng):
 		if not self.exist_node(name):
-			self.list_n.append(nodot(name,dirc,True,leng))
+			self.list_n.append(Nodot(name,dirc,True,leng))
 			return True
 		return False
 
