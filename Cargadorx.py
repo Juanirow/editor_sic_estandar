@@ -57,7 +57,7 @@ class Cargadorx(QtGui.QDockWidget):
         self.create_memory()
         self.dirsc = self.dirprog
         self.direj = self.dirprog
-
+        self.step_2(list_obj)
 
     def step_1(self,list_obj):
         band_error = False
