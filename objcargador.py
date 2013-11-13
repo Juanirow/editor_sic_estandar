@@ -71,7 +71,7 @@ class Objcargador(QtGui.QDockWidget):
     def get_list_of_list(self,list_obj):
         list_ret = []
         for s in list_obj:
-            f = opens
+            f = open(s)
             obj = f.read()
             list_ret.append(obj.split("\n")[:-1])
         return list_ret

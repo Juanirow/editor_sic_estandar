@@ -10,7 +10,7 @@ class Nodot():
 		self.name = name
 		self.dir = dirc
 		self.sc = sc
-		self.len = lengs
+		self.len = leng
 
 	# regresa el nombre de la variable o seccione de control
 	def get_name(self):
@@ -61,7 +61,7 @@ class Tabse():
 	# regresa True si la pudo insertar 
 	def insert_variable(self,name,dirc):
 		if not self.exist_node(name):
-			self.list_n.appen(Nodot(name,dirc))
+			self.list_n.append(Nodot(name,dirc))
 			return True
 		return False
 

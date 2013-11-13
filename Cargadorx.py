@@ -21,6 +21,7 @@ class Cargadorx(QtGui.QDockWidget):
         self.direj = "0H"
         self.hexa = Hexadecimal()
         self.convert = Convert()
+        self.register = Register("A")
         # self.file_name = None
         # self.init = None
         # self.header = None
@@ -53,6 +54,7 @@ class Cargadorx(QtGui.QDockWidget):
         self.dirprog = self.convert.decimal_to_hexadecimal(val_int)
         self.dirsc = self.dirprog
         self.step_1(list_obj)
+        self.create_memory()
         self.dirsc = self.dirprog
         self.direj = self.dirprog
 
@@ -67,7 +69,7 @@ class Cargadorx(QtGui.QDockWidget):
                     ret = self.step_1_d(n)
                 if not band_error and ret:
                     band_error = ret
-            self.dirsc = self.hexa.plus(self.dirsc+self.lonsc)
+            self.dirsc = self.hexa.plus(self.dirsc,self.lonsc)
         return band_error    
 
     def step_h(self,n,step):
@@ -116,15 +118,27 @@ class Cargadorx(QtGui.QDockWidget):
             self.dirsc = self.hexa.plus(self.dirsc+self.lonsc) 
 
     def charge_obj_code(self,n):
-        print "t"
+        print "M"
 
     def change_m_register(self,n):
         print "m"
 
-
-
-
-
+    def create_memory(self):
+        init = self.dirprog[:-1]
+        length = self.hexa.subs(self.dirsc,self.dirprog)[:-1]
+        star_rows= length[:-1]
+        index = init[:-1]
+        num_rows=star_rows+"H"
+        num_rows=int(self.convert.to_decimal(num_rows))
+        self.window.tableWidget.setRowCount(num_rows+1)
+        it = 0
+        while it <= num_rows:
+            dir = index+"0H"
+            dir = self.register.adjust_bytes(dir,6,False)
+            item = QtGui.QTableWidgetItem(dir)
+            self.window.tableWidget.setItem(it,0,item)
+            it += 1
+            index = self.hexa.plus(index,"1H")[:-1]
 
 
 
