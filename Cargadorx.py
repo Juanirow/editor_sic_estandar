@@ -41,7 +41,7 @@ class Cargadorx(QtGui.QDockWidget):
 
      
     def load_file_name(self,list_obj):
-            
+         print "Hola"   
     # def simular(self):
     #     num_actions = self.get_count_next_actions()
     #     if num_actions == -1:
