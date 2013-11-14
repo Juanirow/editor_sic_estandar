@@ -21,6 +21,9 @@ class Objcargador(QtGui.QDockWidget):
         self.window.pushButton_2.clicked.connect(self.cargar_ligar)
         self.cargador = None
 
+    def show_error(self,msg):
+        QtGui.QMessageBox.about(self,"Error",msg)
+
     def abrir(self):
     	fname = QtGui.QFileDialog.getOpenFileNames(self, 'Abrir Archivo', 
                 '/home/juan/Escritorio/ejemplos', "Files (*.ox)")
@@ -61,10 +64,19 @@ class Objcargador(QtGui.QDockWidget):
                 res = res.group()
                 if res == text:
                     list_obj = self.get_list_obj()
-                    self.cargador = Cargadorx()
-                    self.cargador.show()
-                    list_obj = self.get_list_of_list(list_obj)
-                    self.cargador.load_file_name(list_obj,text)
+                    if len(list_obj) > 0:
+                        self.cargador = Cargadorx()
+                        self.cargador.show()
+                        list_obj = self.get_list_of_list(list_obj)
+                        self.cargador.load_file_name(list_obj,text)
+                    else:
+                        self.show_error("No hay archivos para cargar")
+                else:
+                    self.show_error("La direccion no es correcta")
+            else:
+                self.show_error("La direccion de carga no es correcta")
+        else:
+            self.show_error("Falta la direccion de carga")
 
     ## rergesa una lista que contiene una lista de registros
     # que contiene cada archivo en la lista de parametro 

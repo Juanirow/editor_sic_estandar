@@ -25,6 +25,9 @@ class Cargadorx(QtGui.QDockWidget):
         self.error_indefinido = False
         self.error_duplicado = False
 
+    def show_error(self,msg):
+        QtGui.QMessageBox.about(self,"Error",msg)
+
     def load_file_name(self,list_obj,dirprog):
         val_int = self.convert.to_decimal(dirprog)
         self.dirprog = self.convert.decimal_to_hexadecimal(val_int)
@@ -37,9 +40,9 @@ class Cargadorx(QtGui.QDockWidget):
             self.step_2(list_obj)
             self.init_empty_rows()
             if self.error_indefinido:
-                self.window.label_sig.setText("Error en simbolo indefinido")
+                self.show_error("Error en simbolo indefinido")
         else:
-            self.window.label_sig.setText("Error simbolo duplicado")
+            self.show_error("Error simbolo duplicado")
 
 
     def step_1(self,list_obj):
@@ -60,19 +63,19 @@ class Cargadorx(QtGui.QDockWidget):
             if not self.tabse.exist_node(name):
                 self.tabse.insert_section(name,self.dirsc,self.lonsc)
             else:
-                print name
+                ##print name
                 self.error_duplicado = True
 
     def step_1_d(self,n):
         num = (len(n)-1)/12
         it = 0
-        print "num",num,len(n)
+        ##print "num",num,len(n)
         while it < num:
             index1 = (it * 12)+1
             index2 = index1 + 6
             index3 = index2 + 6
             name = n[index1:index2].strip()
-            print "name",name 
+            ##print "name",name 
             if index3 >= len(n):
                 len_r = n[index2:]+"H"
             else:
