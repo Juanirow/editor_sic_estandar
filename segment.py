@@ -201,7 +201,7 @@ class Segment:
     #@param line linea de codigo donde se encontro un error
     #@param text cadena que se genera en el error
     def insert_error(self,line,text):
-        l = int(line) - self.last_code
+        l = int(line) - self.last_code -1
         if not str(l) in self.get_segment().errors and l >= 0:
             self.get_segment().errors[str(l)]= text
     
@@ -248,7 +248,8 @@ class Segment:
         for it in self.list_n:
             # print it.errors,it.errors_s
             it.archivo_intermedio(extension)
-            it.archivo_objeto(extension)
+            if len(it.errors) == 0 and len(it.errors_s) == 0:
+                it.archivo_objeto(extension)
             print "Errors", len(it.errors)+len(it.errors_s)
 
     def get_num_errors_all(self):

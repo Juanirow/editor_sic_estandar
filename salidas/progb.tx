@@ -1,0 +1,42 @@
+CP        BLOQUE    CODIGO                                       C. Objeto 
+00H       0         PROGB	CSECT                                  	         
+000000H   0         		EXTDEF	LISTB,ENDB                          	         
+000000H   0         		EXTREF	LISTA, ENDA,LISTC, ENDC             	         
+000000H   0         		ORG		36h                                   	         
+36H       0         REF1	++LDA	LISTA	                            P:No se reconoce el token +LexToken(PLUS,'+',21,396)	
+000039H   0         REF2	LDT		LISTB+4                            	         
+00003DH   0         REF3	+LDX	#ENDA-LISTA                        	         
+000040H   0         		ORG		60H                                   	         
+000044H   0         LISTB	EQU		*                                 	         
+60H       0         		ORG		70h                                   	         
+000060H   0         ENDB	EQU		*                                  	         
+70H       0         REF4	WORD	ENDA-LISTA+LISTC	                  	         
+000070H   0         REF5	WORD	ENDC-LISTC-10                      	         
+000073H   0         REF6	WORD	ENDC-LISTC+LISTA-1                 	         
+000076H   0         REF7	WORD	ENDA-LISTA-(ENDB-LISTB)            	         
+000079H   0         REF8	WORD	LISTB-LISTA                        	         
+Tabla de Simbolos 
+
+NOMBRE      DIR/VAL     TIPO        BLOQUE      EXTERNO     
+LISTA       0H          _           0           True        
+ENDA        0H          _           0           True        
+LISTC       0H          _           0           True        
+ENDC        0H          _           0           True        
+REF1        36H         relativo    0           False       
+REF2        000039H     relativo    0           False       
+REF3        00003DH     relativo    0           False       
+LISTB       60H         relativo    0           False       
+ENDB        70H         relativo    0           False       
+REF4        70H         relativo    0           False       
+REF5        000070H     relativo    0           False       
+REF6        000073H     relativo    0           False       
+REF7        000076H     relativo    0           False       
+REF8        000079H     relativo    0           False       
+
+
+Tabla de Bloques 
+
+DIR_CARGA         NOMBRE            NUM_BLOQUE        TAMAÑO           
+0H                por omision       0                 0H                
+
+

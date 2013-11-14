@@ -23,6 +23,7 @@ disp = Displacement()
 reg = Register("R")
 extension =""
 registers = {"A":0,"X":1,"L":2,"CP":8,"SW":9,"B":3,"S":4,"T":5,"F":6}
+have_errors = False
 
 ## carga el codigo en la lista de codigo y le elimina los 
 # nodos vacios 
@@ -289,6 +290,9 @@ def p_directiva_end(p):
       seg.get_segment().step2.directive_end(dir,seg.get_segment().pc[0])
       seg.get_segment().obj_code.append("")
   else:
+      line = p.lineno(1)-1
+      errors = errors_offset(scann.errors,line)
+      seg.get_segment().errors_s = errors
       seg.get_segment().code = parse.list_code[seg.last_code:-1]
       seg.get_segment_at(0).code.append(parse.list_code[-1])
   pass 
