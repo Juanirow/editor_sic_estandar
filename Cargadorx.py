@@ -38,11 +38,13 @@ class Cargadorx(QtGui.QDockWidget):
             self.dirsc = self.dirprog
             self.direj = self.dirprog
             self.step_2(list_obj)
-            self.init_empty_rows()
+            ##self.init_empty_rows()
+            self.tabse.print_tabse()
             if self.error_indefinido:
                 self.show_error("Error en simbolo indefinido")
         else:
             self.show_error("Error simbolo duplicado")
+
 
 
     def step_1(self,list_obj):
@@ -75,7 +77,7 @@ class Cargadorx(QtGui.QDockWidget):
             index2 = index1 + 6
             index3 = index2 + 6
             name = n[index1:index2].strip()
-            ##print "name",name 
+            #print "name",name 
             if index3 >= len(n):
                 len_r = n[index2:]+"H"
             else:
@@ -91,6 +93,7 @@ class Cargadorx(QtGui.QDockWidget):
     def step_2(self,list_obj):
         for list_n in list_obj:
             for n in list_n:
+                print n
                 if len(n) > 0:
                     if n[0] == "H":
                         self.step_h(n,2)

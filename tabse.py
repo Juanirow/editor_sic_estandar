@@ -81,6 +81,11 @@ class Tabse():
 			return True
 		return False
 
+	def print_tabse(self):
+		for n in self.list_n:
+			print n.get_name(),n.get_dir()
+
+
 
 
 
