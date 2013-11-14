@@ -23,7 +23,7 @@ class Objcargador(QtGui.QDockWidget):
 
     def abrir(self):
     	fname = QtGui.QFileDialog.getOpenFileNames(self, 'Abrir Archivo', 
-                '/home/Desktop/Progra/EditorSIC/ejemplos', "Files (*.ox)")
+                '/home/juan/Escritorio/ejemplos', "Files (*.ox)")
     	for s in fname:
     		self.window.listWidget.addItem(s)
 

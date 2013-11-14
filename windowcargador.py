@@ -99,7 +99,7 @@ class Ui_DockWidget(object):
         self.label_2.setGeometry(QtCore.QRect(720, 380, 191, 17))
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.label_sig = QtGui.QLabel(self.dockWidgetContents)
-        self.label_sig.setGeometry(QtCore.QRect(750, 410, 66, 17))
+        self.label_sig.setGeometry(QtCore.QRect(750, 410, 660, 17))
         self.label_sig.setObjectName(_fromUtf8("label_sig"))
         DockWidget.setWidget(self.dockWidgetContents)
         self.actionSimular = QtGui.QAction(DockWidget)

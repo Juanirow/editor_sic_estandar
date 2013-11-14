@@ -57,6 +57,14 @@ class Tabse():
 				return True
 		return False
 
+	## regresa el registro de la tabse el cual coiside el nombre
+	def get_register(self,name):
+		val = name.strip()
+		for n in self.list_n:
+			if n.get_name() == val:
+				return n
+		return None
+
 	## inserta una variable a la tabla si esque esta no esta definida
 	# regresa True si la pudo insertar 
 	def insert_variable(self,name,dirc):
