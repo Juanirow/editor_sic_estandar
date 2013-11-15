@@ -48,6 +48,7 @@ class Hexadecimal:
         else:
             res = convert.decimal_to_hexadecimal(res)
         return res
+        
     ## resta dos numeros hexadecimales
     # @param num1 valor numerico a restar 
     # @param num2 valor numerico a restar 
