@@ -31,6 +31,7 @@ class Cargadorx(QtGui.QDockWidget):
     def load_file_name(self,list_obj,dirprog):
         val_int = self.convert.to_decimal(dirprog)
         self.dirprog = self.convert.decimal_to_hexadecimal(val_int)
+        self.dirprog = self.register.adjust_bytes(self.dirprog,6,False)+"H"
         self.dirsc = self.dirprog
         self.step_1(list_obj)
         if not self.error_duplicado:
@@ -38,7 +39,7 @@ class Cargadorx(QtGui.QDockWidget):
             self.dirsc = self.dirprog
             self.direj = self.dirprog
             self.step_2(list_obj)
-            ##self.init_empty_rows()
+            # self.init_empty_rows()
             self.tabse.print_tabse()
             if self.error_indefinido:
                 self.show_error("Error en simbolo indefinido")
@@ -116,8 +117,9 @@ class Cargadorx(QtGui.QDockWidget):
         init = r[1:7]
         init = self.hexa.plus(init+"H",self.dirsc)[:-1]
         col_start = init[-1]+"H"
-        col = int(self.convert.to_decimal(col_start)  + 1) 
-        res = self.hexa.subs(init[:-1],self.dirprog[:-2])
+        col = int(self.convert.to_decimal(col_start)  + 1)
+        dat1 = self.get_part_dat(init)
+        res = self.hexa.subs(dat1,self.dirprog[:-2])
         dec_res = int(self.convert.to_decimal(res))
         while index < len(string):
             byte = string[index:index+2]
@@ -129,12 +131,18 @@ class Cargadorx(QtGui.QDockWidget):
                 col = 1
                 dec_res += 1
 
+    def get_part_dat(self,dat):
+        if len(dat) == 1:
+            return "0"
+        else:
+            return dat[:-1]
+
     def change_m_register(self,r):
         val = r[1:7]
         med_byte = r[7:9]
         sign = r[9]
         name = r[10:].strip()
-        print val,med_byte,sign,name
+        # print val,med_byte,sign,name
         n = self.tabse.get_register(name)
         if n:
             # print "existe"
@@ -146,13 +154,8 @@ class Cargadorx(QtGui.QDockWidget):
                 ant_content = content[0]
                 content = content[1:]
             dir_es = n.get_dir()
-            # print ant_content,content
-            # if sign == "-":
-            #     new_dir = self.hexa.subs(content,dir_es)[:-1]
-            # else:
-            #     new_dir = self.hexa.plus(content,dir_es)[:-1]
             new_dir = self.make_operation(sign,content,dir_es)
-            print "perico",new_dir,content,sign,dir_es
+            # print "perico",new_dir,content,sign,dir_es
             new_dir = self.register.adjust_bytes(new_dir,6,True)
             if med_byte == "5":
                 new_dir = ant_content + new_dir[1:]
@@ -160,8 +163,8 @@ class Cargadorx(QtGui.QDockWidget):
             # print new_dir
             col_num = val[-1] + "H"
             col = int(self.convert.to_decimal(col_num) + 1)
-            ren = self.hexa.subs(val[:-1],self.dirprog[:-2])
-            # print col,ren
+            val = self.get_part_dat(val)
+            ren = self.hexa.subs(val,self.dirprog[:-2])
             ren = int(self.convert.to_decimal(ren))
             index = 0
             while index < len(new_dir):
@@ -210,7 +213,8 @@ class Cargadorx(QtGui.QDockWidget):
     def get_content_at(self,dirr,num):
         dir_n = dirr[-1]+"H"
         col = int(self.convert.to_decimal(dir_n) + 1)
-        ren = self.hexa.subs(dirr[:-1],self.dirprog[:-2])
+        dire = self.get_part_dat(dirr)
+        ren = self.hexa.subs(dire,self.dirprog[:-2])
         ren = int(self.convert.to_decimal(ren))
         it = 0
         text = ""

@@ -180,6 +180,8 @@ class Convert:
           ns = str(int(vf*16))
           ns = self.dec_caracters.get(int(ns),ns)
           s = ns + s
+      if s == "":
+        s = "0"
       return s+"H"
   
     def list_to_string(self,dicc):

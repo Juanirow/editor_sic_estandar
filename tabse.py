@@ -88,8 +88,8 @@ class Tabse():
 		self.table = Table_tabse()
 		self.table.show()
 		self.table.load_tabse(self.list_n)
-		for n in self.list_n:
-			print n.get_name(),n.get_dir()
+		# for n in self.list_n:
+		# 	print n.get_name(),n.get_dir()
 
 
 class Table_tabse(QtGui.QDockWidget):
