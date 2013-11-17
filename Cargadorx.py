@@ -1,19 +1,13 @@
 from PyQt4 import QtCore, QtGui
-from windowcargador import Ui_DockWidget
 from hexadecimal import Hexadecimal
 from convert import Convert
 from register import Register
 from tabse import Tabse
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
+
     
-class Cargadorx(QtGui.QDockWidget):
-    def __init__(self,parent=None):
-        QtGui.QWidget.__init__(self)
-        self.window = Ui_DockWidget()
-        self.window.setupUi(self)
+class Cargadorx():
+    def __init__(self,window):
+        self.window = window
         self.tabse = Tabse()
         self.lonsc = "0H"
         self.dirsc = "0H"
@@ -39,7 +33,7 @@ class Cargadorx(QtGui.QDockWidget):
             self.dirsc = self.dirprog
             self.direj = self.dirprog
             self.step_2(list_obj)
-            # self.init_empty_rows()
+            self.init_empty_rows()
             self.tabse.print_tabse()
             if self.error_indefinido:
                 self.show_error("Error en simbolo indefinido")
@@ -94,7 +88,6 @@ class Cargadorx(QtGui.QDockWidget):
     def step_2(self,list_obj):
         for list_n in list_obj:
             for n in list_n:
-                ##print n
                 if len(n) > 0:
                     if n[0] == "H":
                         self.step_h(n,2)

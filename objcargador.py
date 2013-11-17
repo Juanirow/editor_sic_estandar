@@ -2,6 +2,7 @@ from objform import Ui_objform
 from PyQt4 import QtCore, QtGui
 from listobj import Ui_DockWidget
 from Cargadorx import Cargadorx
+from simuladorx import Simuladorx
 import re
 
 try:
@@ -19,7 +20,7 @@ class Objcargador(QtGui.QDockWidget):
         self.window.btn_abajo.clicked.connect(self.down)
         self.window.btn_eliminar.clicked.connect(self.delete)
         self.window.pushButton_2.clicked.connect(self.cargar_ligar)
-        self.cargador = None
+        self.simulador = None
 
     def show_error(self,msg):
         QtGui.QMessageBox.about(self,"Error",msg)
@@ -65,10 +66,10 @@ class Objcargador(QtGui.QDockWidget):
                 if res == text:
                     list_obj = self.get_list_obj()
                     if len(list_obj) > 0:
-                        self.cargador = Cargadorx()
-                        self.cargador.show()
+                        self.simulador = Simuladorx()
+                        self.simulador.show()
                         list_obj = self.get_list_of_list(list_obj)
-                        self.cargador.load_file_name(list_obj,text)
+                        self.simulador.carga(list_obj,text)
                     else:
                         self.show_error("No hay archivos para cargar")
                 else:
