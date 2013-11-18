@@ -1,0 +1,20 @@
+CP        BLOQUE    CODIGO                                       C. Objeto 
+0H        0         PRUEBA START 0H                                        	         
+0H        0         DIEZ WORD 10                                 00000A    	         
+000003H   0         INI ADD DIEZ                                 1B2FFA    	         
+000006H   0         ADD #100                                     190064    	         
+000009H   0         ADDR A,A                                     9000      	         
+00000BH   0         END INI                                                	         
+Tabla de Simbolos 
+
+NOMBRE      DIR/VAL     TIPO        BLOQUE      EXTERNO     
+DIEZ        0H          relativo    0           False       
+INI         000003H     relativo    0           False       
+
+
+Tabla de Bloques 
+
+DIR_CARGA         NOMBRE            NUM_BLOQUE        TAMAÑO           
+0H                por omision       0                 BH                
+
+

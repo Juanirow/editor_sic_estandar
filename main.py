@@ -49,7 +49,11 @@ class Window_Form(QtGui.QMainWindow):
                 self.cargador.show()
                 self.cargador.load_file_name(self.file_name)
             else:
-                self.set_statusBar_Text("El archivo no es uno de la version estandar")
+                self.cargadorx = Objcargador()
+                self.cargadorx.show()
+                ficheros = os.listdir("./salidas")
+                for s in ficheros:
+                    self.cargadorx.window.listWidget.addItem("./salidas"+s)                    
 
     def close_file(self):
         if self.textbox:

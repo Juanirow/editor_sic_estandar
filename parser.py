@@ -75,6 +75,7 @@ def get_line_at(line):
 def get_pc_at(line):
     line_n = line - parse.last_index
     pc =  seg.get_segment().pc[line_n]
+    # print line_n,pc
     # print "parserL141",line,line_n,seg.get_segment().pc,parse.last_index,pc
     return pc
 
@@ -921,11 +922,15 @@ def p_inmediato_constante(p):
 
 def next_cp_bloque(line,numb):
     it = line + 1
-    #print it, len(seg.get_segment().num_bloque)
+    # print it, len(seg.get_segment().num_bloque),line
     while it - parse.last_index < len(seg.get_segment().num_bloque):
+        # print "it",it
+        # if it == 0:
+        #   it = 1
         blq_val = get_bloque_at(it)
-       # print numb,blq_val
+        # print numb,blq_val
         if numb == blq_val:
+            print get_pc_at(it)
             return get_pc_at(it)
         it += 1
     return seg.get_segment().bloques.get_last_pc_at(numb)

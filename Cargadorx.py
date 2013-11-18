@@ -100,7 +100,7 @@ class Cargadorx():
             self.dirsc = self.hexa.plus(self.dirsc,self.lonsc) 
 
     def reg_e(self,r):
-        if len(r) < 1:
+        if len(r) > 1:
             val = r[1:] + "H"
             self.direj = self.hexa.plus(self.dirsc,val)
 

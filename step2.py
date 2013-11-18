@@ -50,9 +50,11 @@ class Step2:
         if self.current_register.get_len() == 0:
             self.current_register.init_dir = dir
             self.current_register.instert_string(str)
+            print "nuevo",str,dir
         else:
             if self.current_register.fits_in(str):
                 self.current_register.instert_string(str)
+                print "agrega",str,dir
             else:
                 self.complete_register()
                 self.insert_str(str,dir)

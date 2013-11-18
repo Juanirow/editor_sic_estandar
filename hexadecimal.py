@@ -48,6 +48,44 @@ class Hexadecimal:
         else:
             res = convert.decimal_to_hexadecimal(res)
         return res
+
+    def suma(self,num1,num2):
+        convert = Convert()
+        print "antt",num1,num2        
+        num1 = self.get_int_operator(num1)
+        num2 = self.get_int_operator(num2)  
+        res = num1+num2
+        print "desp",num1,num2,res        
+        if res < 0:
+            res = int(res * -1)
+            res = res ^ 4095
+            res += 1
+        if res == 0:
+            res = "0H"
+        else:
+            res = convert.decimal_to_hexadecimal(res)
+        return res
+
+    def get_int_operator(self,dat):
+        convert = Convert()
+        if dat[-1] == "H":
+            dat = dat[:-1]
+        if dat[0] == "F":
+            string = ""
+            it = 0
+            while it < len(dat):
+                if not dat[it] == "F":
+                    string += dat[it]
+                it += 1
+            if len(string) == 0:
+                return -1
+            else:
+                val = "1"+("0"*len(string))+"H"
+                val = convert.to_decimal(val)
+                val2 = convert.to_decimal(string+"H")
+                return val2-val
+        else:
+            return convert.to_decimal(dat+"H")
         
     ## resta dos numeros hexadecimales
     # @param num1 valor numerico a restar 
