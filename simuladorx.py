@@ -32,6 +32,7 @@ class Simuladorx(QtGui.QDockWidget):
 		self.register = Register("A")
 		self.init_registers()
 		self.end_program = "0H"
+		self.cc_val = "="
 		self.window.btnSimular.clicked.connect(self.simular)
 		self.operations_3 = {"18":"ADD","00":"LDA","40":"AND","28":"COMP","24":"DIV","3C":"J","30":"JEQ","34":"JGT","38":"JLT",
                            "48":"JSUB","50":"LDCH","08":"LDL","04":"LDX","20":"MUL","4C":"RSUB","0C":"STA","54":"STCH","14":"STL",
@@ -41,7 +42,7 @@ class Simuladorx(QtGui.QDockWidget):
 		self.operations_1 = {"C4":"FIX","C0":"FLOAT","F4":"HIO","C8":"NORM","F0":"SIO","F8":"TIO"}
 		self.operations_2 = {"90":"ADDR","B4":"CLEAR","A0":"COMPR","9C":"DIVR","98":"MULR","AC":"RMO","A4":"SHIFTL","A8":"SHIFTR",
 							"94":"SUBR","B0":"SVC","B8":"TIXR"}
-		self.operations = {"18":self.add,"00":"LDA","40":"AND","28":"COMP","24":"DIV","3C":"J","30":"JEQ","34":"JGT","38":"JLT",
+		self.operations = {"18":self.add,"00":"LDA","40":self.and_op,"28":self.comp,"24":self.div,"3C":"J","30":"JEQ","34":"JGT","38":"JLT",
                            "48":"JSUB","50":"LDCH","08":"LDL","04":"LDX","20":"MUL","4C":"RSUB","0C":"STA","54":"STCH","14":"STL",
                            "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX","58":self.float_operations,"88":self.float_operations,
                            "64":self.float_operations,"68":"LDB","70":self.float_operations,"6C":"LDS","74":"LDT",
@@ -49,7 +50,7 @@ class Simuladorx(QtGui.QDockWidget):
                            "80":self.float_operations,"D4":self.system_operations,"7C":"STC","E8":self.system_operations,
                            "84":"STT","5C":"SUBF","E0":self.system_operations,"DC":self.system_operations,"C4":self.float_operations,
                            "C0":self.float_operations,"F4":self.system_operations,"C8":self.float_operations,"F0":self.system_operations,
-                           "F8":self.system_operations,"90":self.addr,"B4":"CLEAR","A0":"COMPR","9C":"DIVR","98":"MULR","AC":"RMO","A4":"SHIFTL",
+                           "F8":self.system_operations,"90":self.addr,"B4":self.clear,"A0":self.compr,"9C":"DIVR","98":"MULR","AC":"RMO","A4":"SHIFTL",
                            "A8":"SHIFTR","94":"SUBR","B0":"SVC","B8":"TIXR"}
 		self.registers = {"0":[self.REG_A,"A"],"1":[self.REG_X,"X"],"2":[self.REG_L,"L"],"8":[self.REG_CP,"CP"],"9":[self.REG_SW,"SW"],"3":[self.REG_B,"B"],
        "4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
@@ -284,3 +285,50 @@ class Simuladorx(QtGui.QDockWidget):
 		string += "("+r2[1]+")<-"+res
 		self.set_register(r2[0],res)
 		self.window.textEdit_Actions.setText(string)
+
+	def and_op(self,m):
+		string = "A <- (A) & (m..m+2)\n"
+		a = self.get_register(self.REG_A)
+		# string += "(A) : " + a +"\n" +"(m..m+2) : "+m
+		res = self.hexa.and_op(a,m)
+		self.set_register(self.REG_A,res)
+		self.window.textEdit_Actions.setText(string)
+
+	def clear(self,m):
+		r = self.registers(m[0])
+		string = "r1 <- 0\nr1:"+r[1]
+		self.set_register(r[0],"0H") 
+		self.window.textEdit_Actions.setText(string)
+
+	def comp(self,m):
+		string = "CC = (A) : (m..m+2)"
+		a = self.get_register(self.REG_A)
+		self.cc_val = self.hexa.cmp_op(a,m)
+		string += "CC ="+self.cc_val
+		self.window.textEdit_Actions.setText(string)
+
+	def compr(self,m):
+		r1 = self.registers[m[0]]
+		r2 = self.registers[m[1]]
+		dat1 = self.get_register(r1[0])
+		dat2 = self.get_register(r2[0])
+		string = "CC = r1 : r2\n"+"r1 = "+r1[1]+"\nr2 = "+r2[1]
+		self.cc_val = self.hexa.cmp_op(dat1,dat2)
+		string += "\n CC = "+self.cc_val
+		self.window.textEdit_Actions.setText(string)
+
+	def div(self,m):
+		string = "A <- (A) / (m..m+2)"
+		a = self.get_register(self.REG_A)
+		res = self.hexa.div(a,m)
+		self.set_register(self.REG_A,res)
+		self.window.textEdit_Actions.setText(string)
+
+
+
+
+
+
+
+
+

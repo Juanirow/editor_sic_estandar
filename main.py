@@ -53,7 +53,7 @@ class Window_Form(QtGui.QMainWindow):
                 self.cargadorx.show()
                 ficheros = os.listdir("./salidas")
                 for s in ficheros:
-                    self.cargadorx.window.listWidget.addItem("./salidas"+s)                    
+                    self.cargadorx.window.listWidget.addItem("./salidas/"+s)                    
 
     def close_file(self):
         if self.textbox:
