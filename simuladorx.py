@@ -59,7 +59,8 @@ class Simuladorx(QtGui.QDockWidget):
                            "A8":"SHIFTR","94":self.subr,"B0":"SVC","B8":self.tixr}
 		self.registers = {"0":[self.REG_A,"A"],"1":[self.REG_X,"X"],"2":[self.REG_L,"L"],"8":[self.REG_CP,"CP"],"9":[self.REG_SW,"SW"],"3":[self.REG_B,"B"],
        				"4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
-       				
+		self.operations_m = ["J","JLT","JEQ","JGT","JSUB","STA","STB","STCH","STL","STS","STSW","STT","STX"]
+
 	def simular(self):
 		num_actions = self.get_count_next_actions()
 		if num_actions == -1:
@@ -74,7 +75,8 @@ class Simuladorx(QtGui.QDockWidget):
 			if self.hexa.minus_than(cp,self.end_program):
 				op = self.get_operation()
 				type_op = op[2]
-				m = self.get_m(type_op,cp)
+				inst = op[1]
+				m = self.get_m(type_op,cp,inst)
 				if m == "Error":
 					self.window.textEdit_Actions.setText("El programa se termino debido a un error de operacion")
 				else:
@@ -85,7 +87,7 @@ class Simuladorx(QtGui.QDockWidget):
 				self.window.textEdit_Actions.setText("El programa se termino")
 			it += 1
 
-	def get_m(self,type_op,cp):
+	def get_m(self,type_op,cp,inst):
 		if type_op == "Error":
 			return type_op
 		if type_op == "1":
@@ -95,6 +97,8 @@ class Simuladorx(QtGui.QDockWidget):
 			cp_n = self.hexa.plus(cp,"1H")
 			self.increment_cp(2)
 			return self.get_data_form_mem(cp_n,1)
+		if inst in self.operations_m:
+			print "\n\n"+inst+"\n\n"
 		return self.get_m_type3()
 
 	def get_count_next_actions(self):
