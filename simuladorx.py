@@ -99,6 +99,7 @@ class Simuladorx(QtGui.QDockWidget):
 			return self.get_data_form_mem(cp_n,1)
 		if inst in self.operations_m:
 			print "\n\n"+inst+"\n\n"
+			return self.get_m_type3_m()
 		return self.get_m_type3()
 
 	def get_count_next_actions(self):
@@ -272,6 +273,55 @@ class Simuladorx(QtGui.QDockWidget):
 				m = self.register.adjust_bytes(m,6,False)
 				m = self.get_data_form_mem(m,3)
 		print "return",m
+		return m
+
+	def get_m_type3_m(self):
+		cp = self.get_register(self.REG_CP)
+		data1 = self.get_data_form_mem(cp,1)
+		type_d = self.get_operation_type(data1)
+		next_loc = self.hexa.plus(cp,"1H")
+		data = self.get_data_form_mem(next_loc,1)
+		print data1,type_d,next_loc,data
+		msb = data[0]
+		msb_d = int(self.convert.to_decimal(msb+"H"))
+		tam = 3
+		if (msb_d & 1) == 1:
+			tam = 4
+		next_loc = self.hexa.plus(next_loc,"1H")
+		m = data[1] + self.get_data_form_mem(next_loc,tam-2)
+		print m,tam,next_loc
+		cp = self.get_register(self.REG_CP)
+		cp = self.hexa.plus(cp,str(tam))
+		self.set_register(self.REG_CP,cp)
+		if type_d == "simple_s":
+			m = str(msb_d & 7) + m
+			type_d = "simple"
+		elif (msb_d & 6) == 0:
+			m = m
+		else:
+			if (msb_d & 4) == 4:
+				b = self.get_register(self.REG_B)
+				m = self.hexa.change_hexadecimal(m)
+				print "rel base",b,m
+				m = self.hexa.suma(m,b)
+			if (msb_d & 2) == 2:
+				cp = self.get_register(self.REG_CP)
+				m = self.hexa.change_hexadecimal(m)
+				print "rel cp",cp,m
+				m = self.hexa.suma(m,cp)
+		if (msb_d & 8) == 8:
+			x = self.get_register(self.REG_X)
+			m = self.hexa.change_hexadecimal(m)
+			print ", X",x,m
+			m = self.hexa.suma(m,x)
+		print "mem",m
+		# if not type_d == "inmediato":
+		# 	m = self.register.adjust_bytes(m,6,False)
+		# 	m = self.get_data_form_mem(m,3)
+		# 	if not type_d == "simple":
+		# 		m = self.register.adjust_bytes(m,6,False)
+		# 		m = self.get_data_form_mem(m,3)
+		# print "return",m
 		return m
 		
 	def get_operation_type(self,data):
