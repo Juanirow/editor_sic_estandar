@@ -38,19 +38,24 @@ class Simuladorx(QtGui.QDockWidget):
                            "48":"JSUB","50":"LDCH","08":"LDL","04":"LDX","20":"MUL","4C":"RSUB","0C":"STA","54":"STCH","14":"STL",
                            "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX","58":"ADDF","88":"COMPF","64":"DIVF","68":"LDB","70":"LDF",
                            "6C":"LDS","74":"LDT","D0":"LPS","60":"MULF","EC":"SSK","78":"STB","80":"STF","D4":"STI","7C":"STC","E8":"STSW",
-                           "84":"STT","5C":"SUBF","E0":"TD","DC":"WD"}
+                           "84":"STT","5C":"SUBF","E0":"TD","DC":"WD","44":"OR"}
 		self.operations_1 = {"C4":"FIX","C0":"FLOAT","F4":"HIO","C8":"NORM","F0":"SIO","F8":"TIO"}
 		self.operations_2 = {"90":"ADDR","B4":"CLEAR","A0":"COMPR","9C":"DIVR","98":"MULR","AC":"RMO","A4":"SHIFTL","A8":"SHIFTR",
 							"94":"SUBR","B0":"SVC","B8":"TIXR"}
-		self.operations = {"18":self.add,"00":"LDA","40":self.and_op,"28":self.comp,"24":self.div,"3C":"J","30":"JEQ","34":"JGT","38":"JLT",
-                           "48":"JSUB","50":"LDCH","08":"LDL","04":"LDX","20":"MUL","4C":"RSUB","0C":"STA","54":"STCH","14":"STL",
-                           "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX","58":self.float_operations,"88":self.float_operations,
-                           "64":self.float_operations,"68":"LDB","70":self.float_operations,"6C":"LDS","74":"LDT",
+		self.operations = {"18":self.add,"00":self.lda,"40":self.and_op,"28":self.comp,"24":self.div,"3C":self.j_op,
+							"30":self.jeq,"34":self.jgt,"38":self.jlt,"48":self.jsub,"50":self.ldch,
+							"08":self.ldl,"04":self.ldx,"20":self.mul,"4C":self.rsub,"0C":self.sta,"54":"STCH","14":"STL",
+                           "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX","58":self.float_operations,
+                           "88":self.float_operations,
+                           "64":self.float_operations,"68":self.ldb,"70":self.float_operations,"6C":self.lds,"74":self.ldt,
                            "D0":self.system_operations,"60":self.float_operations,"EC":self.system_operations,"78":"STB",
                            "80":self.float_operations,"D4":self.system_operations,"7C":"STC","E8":self.system_operations,
-                           "84":"STT","5C":"SUBF","E0":self.system_operations,"DC":self.system_operations,"C4":self.float_operations,
-                           "C0":self.float_operations,"F4":self.system_operations,"C8":self.float_operations,"F0":self.system_operations,
-                           "F8":self.system_operations,"90":self.addr,"B4":self.clear,"A0":self.compr,"9C":"DIVR","98":"MULR","AC":"RMO","A4":"SHIFTL",
+                           "84":"STT","5C":"SUBF","E0":self.system_operations,"DC":self.system_operations,
+                           "C4":self.float_operations,
+                           "C0":self.float_operations,"F4":self.system_operations,"C8":self.float_operations,
+                           "F0":self.system_operations,"44":self.or_op,
+                           "F8":self.system_operations,"90":self.addr,"B4":self.clear,"A0":self.compr,
+                           "9C":self.divr,"98":self.mulr,"AC":self.rmo,"A4":"SHIFTL",
                            "A8":"SHIFTR","94":"SUBR","B0":"SVC","B8":"TIXR"}
 		self.registers = {"0":[self.REG_A,"A"],"1":[self.REG_X,"X"],"2":[self.REG_L,"L"],"8":[self.REG_CP,"CP"],"9":[self.REG_SW,"SW"],"3":[self.REG_B,"B"],
        "4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
@@ -211,7 +216,7 @@ class Simuladorx(QtGui.QDockWidget):
 			it += 1
 		return 0
         
-	def get_column_index(self,value):        
+	def get_column_index(self,value):
 		index = str(value[-1])+"H"
 		index = self.convert.to_decimal(index)
 		return index+1
@@ -254,6 +259,7 @@ class Simuladorx(QtGui.QDockWidget):
 			m = self.get_data_form_mem(m,3)
 			if not type_d == "simple":
 				m = self.get_data_form_mem(m,3)
+		print "return",m
 		return m
 		
 	def get_operation_type(self,data):
@@ -268,14 +274,13 @@ class Simuladorx(QtGui.QDockWidget):
 			return "inmediato"
 		return "simple_s"
 
-
 	def add(self,m):
-		string = "(A) <- (m..m+2)"+"\n" + "(A) <-  "+ m
+		string = "ADD:\n(A) <- (m..m+2)"+"\n" + "(A) <-  "+ m
 		self.set_register(self.REG_A,m)
 		self.window.textEdit_Actions.setText(string)
 
 	def addr(self,m):
-		string ="r2 <- (r1) + (r2)"+"\n"
+		string ="ADDR\nr2 <- (r1) + (r2)"+"\n"
 		r1 = self.registers[m[0]]
 		r2 = self.registers[m[1]]
 		string += "(r1) = "+r1[1]+"\n (r2) = "+r2[1]+"\n"
@@ -287,24 +292,25 @@ class Simuladorx(QtGui.QDockWidget):
 		self.window.textEdit_Actions.setText(string)
 
 	def and_op(self,m):
-		string = "A <- (A) & (m..m+2)\n"
+		string = "AND\nA <- (A) & (m..m+2)\n"
 		a = self.get_register(self.REG_A)
-		# string += "(A) : " + a +"\n" +"(m..m+2) : "+m
+		string += "(A) : " + a +"\n" +"(m..m+2) : "+m
 		res = self.hexa.and_op(a,m)
 		self.set_register(self.REG_A,res)
 		self.window.textEdit_Actions.setText(string)
 
 	def clear(self,m):
 		r = self.registers(m[0])
-		string = "r1 <- 0\nr1:"+r[1]
+		string = "CLEAR\nr1 <- 0\nr1:"+r[1]
 		self.set_register(r[0],"0H") 
 		self.window.textEdit_Actions.setText(string)
 
 	def comp(self,m):
-		string = "CC = (A) : (m..m+2)"
+		string = "COMP\nCC = (A) : (m..m+2)"
 		a = self.get_register(self.REG_A)
+		string += "\n (A) = "+a+"\n (m..m+2) = "+m
 		self.cc_val = self.hexa.cmp_op(a,m)
-		string += "CC ="+self.cc_val
+		string += "\nCC ="+self.cc_val
 		self.window.textEdit_Actions.setText(string)
 
 	def compr(self,m):
@@ -312,19 +318,170 @@ class Simuladorx(QtGui.QDockWidget):
 		r2 = self.registers[m[1]]
 		dat1 = self.get_register(r1[0])
 		dat2 = self.get_register(r2[0])
-		string = "CC = r1 : r2\n"+"r1 = "+r1[1]+"\nr2 = "+r2[1]
+		string = "COMPR\nCC = r1 : r2\n"+"r1 = "+r1[1]+"\nr2 = "+r2[1]
 		self.cc_val = self.hexa.cmp_op(dat1,dat2)
 		string += "\n CC = "+self.cc_val
 		self.window.textEdit_Actions.setText(string)
 
 	def div(self,m):
-		string = "A <- (A) / (m..m+2)"
+		string = "DIV\nA <- (A) / (m..m+2)"
 		a = self.get_register(self.REG_A)
 		res = self.hexa.div(a,m)
+		string += "\n(A) = "+a+"\n(m..m+2) = "+m+"\n(A) = "+res
 		self.set_register(self.REG_A,res)
 		self.window.textEdit_Actions.setText(string)
 
+	def divr(self,m):
+		r1 = self.registers[m[0]]
+		r2 = self.registers[m[1]]
+		dat1 = self.get_register(r1[0])
+		dat2 = self.get_register(r2[0])
+		string = "DIVR\nr2 <- (r2) / (r1)\nr1 = "+r1[1] +"\nr2 = "+r2[1]
+		res = self.hexa.div(dat2,dat1)
+		string += "r2 = "+res
+		self.set_register(r2[0],res)
+		self.window.textEdit_Actions.setText(string)
 
+	def j_op(self,m):
+		string = "J: \n CP <- m\nm = "+m
+		self.set_register(self.REG_CP,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def jeq(self,m):
+		string = "JEQ: \nsi CC == '=':\n\tCP <- m\n"
+		string += "CC = '"+self.cc_val+"'"
+		if self.cc_val == "=":
+			self.set_register(self.REG_CP,m)
+			string += "\nCP <- "+m
+		self.window.textEdit_Actions.setText(string)
+
+	def jgt(self,m):
+		string = "JGT: \nsi CC == '>':\n\tCP <- m\n"
+		string += "CC = '"+self.cc_val+"'"
+		if self.cc_val == ">":
+			self.set_register(self.REG_CP,m)
+			string += "\nCP <- "+m
+		self.window.textEdit_Actions.setText(string)
+
+	def jlt(self,m):
+		string = "JLT: \nsi CC == '<':\n\tCP <- m\n"
+		string += "CC = '"+self.cc_val+"'"
+		if self.cc_val == "<":
+			self.set_register(self.REG_CP,m)
+			string += "\nCP <- "+m
+		self.window.textEdit_Actions.setText(string)
+
+	def jsub(self,m):
+		string = "JSUB:\n L <- (CP)\nCP <- m"
+		cp = self.get_register(self.REG_CP)
+		string += "\n(CP) = "+cp+"\nm = "+m
+		self.set_register(self.REG_L,cp)
+		self.set_register(self.REG_CP,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def lda(self,m):
+		string = "LDA\nA <- (m..m+2)\n(m..m+2) = "+m
+		self.set_register(self.REG_A,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def ldb(self,m):
+		string = "LDB\nB <- (m..m+2)\n(m..m+2) = "+m
+		self.set_register(self.REG_B,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def ldch(self,m):
+		string = "LDCH\nA[+der] <- (m)"
+		a = self.get_register(self.REG_A)
+		string += "(A) = "+a+"\n(m) = "+m
+		a = self.register.filter_number(a)
+		a = a[0:-1] + m[-1:]
+		self.set_register(self.REG_A,a)
+		self.window.textEdit_Actions.setText(string)
+
+	def ldl(self,m):
+		string = "LDL\nL <- (m..m+2)\n(m..m+2) = "+m
+		self.set_register(self.REG_L,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def lds(self,m):
+		string = "LDS\nS <- (m..m+2)\n(m..m+2) = "+m
+		self.set_register(self.REG_S,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def ldt(self,m):
+		string = "LDT\nT <- (m..m+2)\n(m..m+2) = "+m
+		self.set_register(self.REG_T,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def ldx(self,m):
+		string = "LDX\nX <- (m..m+2)\n(m..m+2) = "+m
+		self.set_register(self.REG_X,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def mul(self,m):
+		a = self.get_register(self.REG_A)
+		string = "MUL\nA <- (A) * (m..m+2)\n(A) = "+a+"\n(m..m+2)="+m
+		res = self.hexa.mul(a,m)
+		string += "\n (A) <- "+res
+		self.set_register(self.REG_A,res)
+		self.window.textEdit_Actions.setText(string)
+
+	def mulr(self,m):
+		r1 = self.registers[m[0]]
+		r2 = self.registers[m[1]]
+		dat1 = self.get_register(r1[0])
+		dat2 = self.get_register(r2[0])
+		string = "MULR\nr2 <- (r2) * (r1)\nr1 = "+r1[1] +"\nr2 = "+r2[1]
+		res = self.hexa.mul(dat2,dat1)
+		string += "r2 = "+res
+		self.set_register(r2[0],res)
+		self.window.textEdit_Actions.setText(string)
+
+	def or_op(self,m):
+		string = "OR\nA <- (A) | (m..m+2)\n"
+		a = self.get_register(self.REG_A)
+		string += "(A) : " + a +"\n" +"(m..m+2) : "+m
+		res = self.hexa.or_op(a,m)
+		self.set_register(self.REG_A,res)
+		self.window.textEdit_Actions.setText(string)
+
+	def rmo(self,m):
+		r1 = self.registers[m[0]]
+		r2 = self.registers[m[1]]
+		dat1 = self.get_register(r1[0])
+		string = "RMO\nr2 <- (r1)\n r1 = "+r1[1]+"\nr2 ="+r2[1]
+		string += "\nr2 <- " + dat1
+		self.set_register(r2[0],dat1)
+		self.window.textEdit_Actions.setText(string)
+
+	def rsub(self,m):
+		l = self.get_register(self.REG_L)		
+		string = "RSUB\nCP <- (L)\n(L) = "+l
+		string += "CP <-"+l
+		self.set_register(self.REG_CP,l)
+		self.window.textEdit_Actions.setText(string)
+
+	def sta(self,m):
+		print "sta",m
+		m = self.register.adjust_bytes(m,6,False)
+		a = self.get_register(self.REG_A)
+		string = "STA\n m..m+2 <- (A)\nm..m+2 = "+m
+		a = self.register.filter_number(a)
+		row = self.get_row_index(m)
+		col = self.get_column_index(m)
+		print "row-col",row,col
+		it = col
+		count = 0
+		while count < len(a):
+			item = self.window.tableWidget.item(row,it)
+			text = a[count:count+2]
+			count += 2
+			item.setText(text)
+			it = (it+1)%17
+			if it == 0:
+				it = 1
+				row+=1
+		self.window.textEdit_Actions.setText(string)
 
 
 

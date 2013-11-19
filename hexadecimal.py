@@ -212,6 +212,8 @@ class Hexadecimal:
         res = convert.decimal_to_hexadecimal(res)
         del convert
         return res
+
+    
     
             
 #hex = Hexadecimal()
