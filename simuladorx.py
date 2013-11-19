@@ -59,7 +59,7 @@ class Simuladorx(QtGui.QDockWidget):
                            "A8":"SHIFTR","94":self.subr,"B0":"SVC","B8":self.tixr}
 		self.registers = {"0":[self.REG_A,"A"],"1":[self.REG_X,"X"],"2":[self.REG_L,"L"],"8":[self.REG_CP,"CP"],"9":[self.REG_SW,"SW"],"3":[self.REG_B,"B"],
        				"4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
-		self.operations_m = ["J","JLT","JEQ","JGT","JSUB","STA","STB","STCH","STL","STS","STSW","STT","STX"]
+		self.operations_m = ["J","JLT","JEQ","JGT","JSUB","STA","STB","STCH","STL","STS","STSW","STT","STX","LDCH"]
 
 	def simular(self):
 		num_actions = self.get_count_next_actions()
@@ -155,6 +155,11 @@ class Simuladorx(QtGui.QDockWidget):
 		self.set_register(self.REG_CP,cp)
 		self.show_next_instr()
 		self.end_program = self.cargador.dirsc
+		if self.cargador.error_duplicado:
+			QtGui.QMessageBox.about(self,"Error","Error simbolo duplicado")
+		elif self.cargador.error_indefinido:
+			QtGui.QMessageBox.about(self,"Error","Error simbolo indefinido")
+
 
 	def increment_cp(self,num):
 		num_hexa = self.convert.decimal_to_hexadecimal(num)
@@ -457,9 +462,11 @@ class Simuladorx(QtGui.QDockWidget):
 	def ldch(self,m):
 		string = "LDCH\nA[+der] <- (m)"
 		a = self.get_register(self.REG_A)
-		string += "(A) = "+a+"\n(m) = "+m
+		m = self.register.adjust_bytes(m,6,False)
+		m = self.get_data_form_mem(m,1)
+		string += "\n(A) = "+a+"\n(m) = "+m
 		a = self.register.filter_number(a)
-		a = a[0:-2] + m[-2:]
+		a = a[0:-2] + m
 		self.set_register(self.REG_A,a)
 		self.window.textEdit_Actions.setText(string)
 
@@ -553,8 +560,10 @@ class Simuladorx(QtGui.QDockWidget):
 	def stch(self,m):
 		m = self.register.adjust_bytes(m,6,False)
 		reg = self.get_register(self.REG_A)
-		reg = self.register.filter_number(reg)[:-2]
+		reg = self.register.filter_number(reg)[-2:]
 		string = "STCH\n m <- (A)[+der]\nm..m+2 = "+m+"\n(A)[+der] = "+reg
+		##S rm = self.hexa.plus(m,"2H")
+		m = self.register.adjust_bytes(m,6,False)
 		print "stsh",reg,m
 		self.modf_reg(reg,m)
 		self.window.textEdit_Actions.setText(string)
@@ -649,6 +658,7 @@ class Simuladorx(QtGui.QDockWidget):
 		string = "TIX\n X <- (X) + 1\n(X) : (r1)\nr1 = "+r1[1]
 		x = self.get_register(self.REG_X)
 		x = self.hexa.plus(x,"1H")
+		self.set_register(self.REG_X,x)
 		self.cc_val = self.hexa.cmp_op(x,dat1)
 		string += "CC = "+self.cc_val
 		self.window.textEdit_Actions.setText(string)

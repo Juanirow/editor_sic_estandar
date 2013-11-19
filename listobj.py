@@ -68,7 +68,7 @@ class Ui_DockWidget(object):
         QtCore.QMetaObject.connectSlotsByName(DockWidget)
 
     def retranslateUi(self, DockWidget):
-        DockWidget.setWindowTitle(_translate("DockWidget", "DockWidget", None))
+        DockWidget.setWindowTitle(_translate("DockWidget", "Cargador de OX", None))
         self.pushButton.setText(_translate("DockWidget", "Abrir", None))
         self.pushButton_2.setText(_translate("DockWidget", "Cargar", None))
         self.label.setText(_translate("DockWidget", "Archivo a Cargar", None))

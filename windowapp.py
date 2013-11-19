@@ -101,7 +101,7 @@ class Ui_windowApp(object):
         QtCore.QMetaObject.connectSlotsByName(windowApp)
 
     def retranslateUi(self, windowApp):
-        windowApp.setWindowTitle(QtGui.QApplication.translate("windowApp", "windowApp", None, QtGui.QApplication.UnicodeUTF8))
+        windowApp.setWindowTitle(QtGui.QApplication.translate("windowApp", "Editor SIC STD/XE", None, QtGui.QApplication.UnicodeUTF8))
         self.menuArchivo.setTitle(QtGui.QApplication.translate("windowApp", "Archivo", None, QtGui.QApplication.UnicodeUTF8))
         self.menuCompilador.setTitle(QtGui.QApplication.translate("windowApp", "Compilador", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNuevo.setText(QtGui.QApplication.translate("windowApp", "Nuevo", None, QtGui.QApplication.UnicodeUTF8))

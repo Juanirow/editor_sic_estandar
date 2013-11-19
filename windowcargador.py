@@ -64,6 +64,7 @@ class Ui_DockWidget(object):
         self.tableWidget_2.setGeometry(QtCore.QRect(40, 390, 171, 181))
         self.tableWidget_2.setRowCount(5)
         self.tableWidget_2.setColumnCount(1)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(60)
         self.tableWidget_2.setObjectName(_fromUtf8("tableWidget_2"))
         item = QtGui.QTableWidgetItem()
         self.tableWidget_2.setVerticalHeaderItem(0, item)

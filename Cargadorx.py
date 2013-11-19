@@ -20,7 +20,8 @@ class Cargadorx():
         self.error_duplicado = False
 
     def show_error(self,msg):
-        QtGui.QMessageBox.about(self,"Error",msg)
+        ##QtGui.QMessageBox.about(self.window,"Error",msg)
+        self.window.textEdit_Actions.setText(msg)
 
     def load_file_name(self,list_obj,dirprog):
         val_int = self.convert.to_decimal(dirprog)
