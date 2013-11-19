@@ -37,26 +37,26 @@ class Simuladorx(QtGui.QDockWidget):
 		self.operations_3 = {"18":"ADD","00":"LDA","40":"AND","28":"COMP","24":"DIV","3C":"J","30":"JEQ","34":"JGT","38":"JLT",
                            "48":"JSUB","50":"LDCH","08":"LDL","04":"LDX","20":"MUL","4C":"RSUB","0C":"STA","54":"STCH","14":"STL",
                            "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX","58":"ADDF","88":"COMPF","64":"DIVF","68":"LDB","70":"LDF",
-                           "6C":"LDS","74":"LDT","D0":"LPS","60":"MULF","EC":"SSK","78":"STB","80":"STF","D4":"STI","7C":"STC","E8":"STSW",
+                           "6C":"LDS","74":"LDT","D0":"LPS","60":"MULF","EC":"SSK","78":"STB","80":"STF","D4":"STI","7C":"STS","E8":"STSW",
                            "84":"STT","5C":"SUBF","E0":"TD","DC":"WD","44":"OR"}
 		self.operations_1 = {"C4":"FIX","C0":"FLOAT","F4":"HIO","C8":"NORM","F0":"SIO","F8":"TIO"}
 		self.operations_2 = {"90":"ADDR","B4":"CLEAR","A0":"COMPR","9C":"DIVR","98":"MULR","AC":"RMO","A4":"SHIFTL","A8":"SHIFTR",
 							"94":"SUBR","B0":"SVC","B8":"TIXR"}
 		self.operations = {"18":self.add,"00":self.lda,"40":self.and_op,"28":self.comp,"24":self.div,"3C":self.j_op,
 							"30":self.jeq,"34":self.jgt,"38":self.jlt,"48":self.jsub,"50":self.ldch,
-							"08":self.ldl,"04":self.ldx,"20":self.mul,"4C":self.rsub,"0C":self.sta,"54":"STCH","14":"STL",
-                           "E8":"STSW","10":"STX","1C":"SUB","2C":"TIX","58":self.float_operations,
+							"08":self.ldl,"04":self.ldx,"20":self.mul,"4C":self.rsub,"0C":self.sta,"54":self.stch,"14":self.stl,
+                           "E8":self.stsw,"10":self.stx,"1C":self.sub,"2C":self.tix,"58":self.float_operations,
                            "88":self.float_operations,
                            "64":self.float_operations,"68":self.ldb,"70":self.float_operations,"6C":self.lds,"74":self.ldt,
-                           "D0":self.system_operations,"60":self.float_operations,"EC":self.system_operations,"78":"STB",
-                           "80":self.float_operations,"D4":self.system_operations,"7C":"STC","E8":self.system_operations,
-                           "84":"STT","5C":"SUBF","E0":self.system_operations,"DC":self.system_operations,
+                           "D0":self.system_operations,"60":self.float_operations,"EC":self.system_operations,"78":self.stb,
+                           "80":self.float_operations,"D4":self.system_operations,"7C":self.sts,"E8":self.system_operations,
+                           "84":self.stt,"5C":self.float_operations,"E0":self.system_operations,"DC":self.system_operations,
                            "C4":self.float_operations,
                            "C0":self.float_operations,"F4":self.system_operations,"C8":self.float_operations,
                            "F0":self.system_operations,"44":self.or_op,
                            "F8":self.system_operations,"90":self.addr,"B4":self.clear,"A0":self.compr,
                            "9C":self.divr,"98":self.mulr,"AC":self.rmo,"A4":"SHIFTL",
-                           "A8":"SHIFTR","94":"SUBR","B0":"SVC","B8":"TIXR"}
+                           "A8":"SHIFTR","94":self.subr,"B0":"SVC","B8":self.tixr}
 		self.registers = {"0":[self.REG_A,"A"],"1":[self.REG_X,"X"],"2":[self.REG_L,"L"],"8":[self.REG_CP,"CP"],"9":[self.REG_SW,"SW"],"3":[self.REG_B,"B"],
        "4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
 
@@ -246,18 +246,26 @@ class Simuladorx(QtGui.QDockWidget):
 			m = m
 		else:
 			if (msb_d & 4) == 4:
-				b = self.get_register(REG_B)
-				m = self.hexa.suma(m+"H",b)
+				b = self.get_register(self.REG_B)
+				m = self.hexa.change_hexadecimal(m)
+				print "rel base",b,m
+				m = self.hexa.suma(m,b)
 			if (msb_d & 2) == 2:
 				cp = self.get_register(self.REG_CP)
-				m = self.hexa.suma(m+"H",cp)
+				m = self.hexa.change_hexadecimal(m)
+				print "rel cp",cp,m
+				m = self.hexa.suma(m,cp)
 		if (msb_d & 8) == 8:
-			x = self.get_register(REG_X)
-			m = self.hexa.suma(m+"H",x)
+			x = self.get_register(self.REG_X)
+			m = self.hexa.change_hexadecimal(m)
+			print ", X",x,m
+			m = self.hexa.suma(m,x)
 		print "mem",m
 		if not type_d == "inmediato":
+			m = self.register.adjust_bytes(m,6,False)
 			m = self.get_data_form_mem(m,3)
 			if not type_d == "simple":
+				m = self.register.adjust_bytes(m,6,False)
 				m = self.get_data_form_mem(m,3)
 		print "return",m
 		return m
@@ -275,8 +283,11 @@ class Simuladorx(QtGui.QDockWidget):
 		return "simple_s"
 
 	def add(self,m):
-		string = "ADD:\n(A) <- (m..m+2)"+"\n" + "(A) <-  "+ m
-		self.set_register(self.REG_A,m)
+		string = "ADD\nA <- (A) + (m..m+2)"
+		a = self.get_register(self.REG_A)
+		res = self.hexa.plus(a,m)
+		string += "\n(A) = "+a+"\n(m..m+2) = "+m+"\n(A) = "+res
+		self.set_register(self.REG_A,res)
 		self.window.textEdit_Actions.setText(string)
 
 	def addr(self,m):
@@ -300,7 +311,7 @@ class Simuladorx(QtGui.QDockWidget):
 		self.window.textEdit_Actions.setText(string)
 
 	def clear(self,m):
-		r = self.registers(m[0])
+		r = self.registers[m[0]]
 		string = "CLEAR\nr1 <- 0\nr1:"+r[1]
 		self.set_register(r[0],"0H") 
 		self.window.textEdit_Actions.setText(string)
@@ -394,7 +405,7 @@ class Simuladorx(QtGui.QDockWidget):
 		a = self.get_register(self.REG_A)
 		string += "(A) = "+a+"\n(m) = "+m
 		a = self.register.filter_number(a)
-		a = a[0:-1] + m[-1:]
+		a = a[0:-2] + m[-2:]
 		self.set_register(self.REG_A,a)
 		self.window.textEdit_Actions.setText(string)
 
@@ -462,27 +473,131 @@ class Simuladorx(QtGui.QDockWidget):
 		self.window.textEdit_Actions.setText(string)
 
 	def sta(self,m):
-		print "sta",m
 		m = self.register.adjust_bytes(m,6,False)
-		a = self.get_register(self.REG_A)
-		string = "STA\n m..m+2 <- (A)\nm..m+2 = "+m
-		a = self.register.filter_number(a)
+		reg = self.get_register(self.REG_A)
+		string = "STA\n m..m+2 <- (A)\nm..m+2 = "+m+"\n(A) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def sta(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_A)
+		string = "STA\n m..m+2 <- (A)\nm..m+2 = "+m+"\n(A) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def stb(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_B)
+		string = "STB\n m..m+2 <- (B)\nm..m+2 = "+m+"\n(B) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def stch(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_A)
+		reg = self.register.filter_number(reg)[:-2]
+		string = "STCH\n m <- (A)[+der]\nm..m+2 = "+m+"\n(A)[+der] = "+reg
+		print "stsh",reg,m
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def stl(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_L)
+		string = "STL\n m..m+2 <- (L)\nm..m+2 = "+m+"\n(L) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def sts(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_S)
+		string = "STS\n m..m+2 <- (S)\nm..m+2 = "+m+"\n(S) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def stsw(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_SW)
+		string = "STSW\n m..m+2 <- (SW)\nm..m+2 = "+m+"\n(SW) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def stt(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_T)
+		string = "STT\n m..m+2 <- (T)\nm..m+2 = "+m+"\n(T) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def stx(self,m):
+		m = self.register.adjust_bytes(m,6,False)
+		reg = self.get_register(self.REG_X)
+		string = "STX\n m..m+2 <- (X)\nm..m+2 = "+m+"\n(X) = "+reg
+		reg = self.register.filter_number(reg)
+		self.modf_reg(reg,m)
+		self.window.textEdit_Actions.setText(string)
+
+	def modf_reg(self,reg,m):
 		row = self.get_row_index(m)
 		col = self.get_column_index(m)
-		print "row-col",row,col
 		it = col
 		count = 0
-		while count < len(a):
+		while count < len(reg):
 			item = self.window.tableWidget.item(row,it)
-			text = a[count:count+2]
+			text = reg[count:count+2]
 			count += 2
 			item.setText(text)
 			it = (it+1)%17
 			if it == 0:
 				it = 1
 				row+=1
+
+	def sub(self,m):
+		string = "ADD\nA <- (A) - (m..m+2)"
+		a = self.get_register(self.REG_A)
+		res = self.hexa.subs(a,m)
+		string += "\n(A) = "+a+"\n(m..m+2) = "+m+"\n(A) = "+res
+		self.set_register(self.REG_A,res)
 		self.window.textEdit_Actions.setText(string)
 
+	def subr(self,m):
+		r1 = self.registers[m[0]]
+		r2 = self.registers[m[1]]
+		dat1 = self.get_register(r1[0])
+		dat2 = self.get_register(r2[0])
+		string = "SUBR\nr2 <- (r2) - (r1)\nr1 = "+r1[1] +"\nr2 = "+r2[1]
+		res = self.hexa.subs(dat2,dat1)
+		string += "r2 = "+res
+		self.set_register(r2[0],res)
+		self.window.textEdit_Actions.setText(string)
+
+	def tix(self,m):
+		x = self.get_register(self.REG_X)
+		string ="TIX\n(X) <- (X) + 1\n(X) : (m..m+2)\n(X)="+x
+		x = self.hexa.plus(x,"1H")
+		self.set_register(self.REG_X,x)
+		string +="\n(X)<- (X) + 1\n(X) <- "+x+"\n(m..m+2)="+m
+		self.cc_val = self.hexa.cmp_op(x,m)
+		string += "\nCC = "+self.cc_val
+		self.window.textEdit_Actions.setText(string)
+
+	def tixr(self,m):
+		r1 = self.registers[m[0]]
+		dat1 = self.get_register(r1[0])
+		string = "TIX\n X <- (X) + 1\n(X) : (r1)\nr1 = "+r1[1]
+		x = self.get_register(self.REG_X)
+		x = self.hexa.plus(x,"1H")
+		self.cc_val = self.hexa.cmp_op(x,dat1)
+		string += "CC = "+self.cc_val
+		self.window.textEdit_Actions.setText(string)
 
 
 

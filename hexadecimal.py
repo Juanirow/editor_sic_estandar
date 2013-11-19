@@ -51,11 +51,11 @@ class Hexadecimal:
 
     def suma(self,num1,num2):
         convert = Convert()
-        print "antt",num1,num2        
+        print "antes",num1,num2       
         num1 = self.get_int_operator(num1)
         num2 = self.get_int_operator(num2)  
-        res = num1+num2
-        print "desp",num1,num2,res        
+        res = num1+num2     
+        print "despues",num1,num2,res
         if res < 0:
             res = int(res * -1)
             res = res ^ 4095
@@ -64,6 +64,7 @@ class Hexadecimal:
             res = "0H"
         else:
             res = convert.decimal_to_hexadecimal(res)
+        print "resultado",res
         return res
 
     def get_int_operator(self,dat):
