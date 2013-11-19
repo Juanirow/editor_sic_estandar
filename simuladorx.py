@@ -58,8 +58,8 @@ class Simuladorx(QtGui.QDockWidget):
                            "9C":self.divr,"98":self.mulr,"AC":self.rmo,"A4":"SHIFTL",
                            "A8":"SHIFTR","94":self.subr,"B0":"SVC","B8":self.tixr}
 		self.registers = {"0":[self.REG_A,"A"],"1":[self.REG_X,"X"],"2":[self.REG_L,"L"],"8":[self.REG_CP,"CP"],"9":[self.REG_SW,"SW"],"3":[self.REG_B,"B"],
-       "4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
-
+       				"4":[self.REG_S,"S"],"5":[self.REG_T,"T"],"6":[self.REG_F,"F"]}
+       				
 	def simular(self):
 		num_actions = self.get_count_next_actions()
 		if num_actions == -1:
