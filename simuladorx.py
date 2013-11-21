@@ -63,6 +63,7 @@ class Simuladorx(QtGui.QDockWidget):
 
 	def simular(self):
 		num_actions = self.get_count_next_actions()
+		print "num actions",num_actions
 		if num_actions == -1:
 			self.window.textEdit_Actions.setText("Numero de simulaciones no Validas")
 		else:
@@ -91,8 +92,8 @@ class Simuladorx(QtGui.QDockWidget):
 		if type_op == "Error":
 			return type_op
 		if type_op == "1":
-			return "0"
 			self.increment_cp(1)
+			return "0"
 		if type_op == "2":
 			cp_n = self.hexa.plus(cp,"1H")
 			self.increment_cp(2)
